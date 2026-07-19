@@ -82,7 +82,7 @@
 
         /* --- RESULT CARD PANEL --- */
         .result-card {
-            display: none; /* Sembunyikan sampai data ditemukan */
+            display: none;
             border: 1px solid rgba(79, 172, 254, 0.4);
             background: rgba(10, 25, 47, 0.6);
             border-radius: 12px;
@@ -177,7 +177,7 @@
         <button onclick="checkID()">CEK ID</button>
     </div>
 
-    <div class="loading" id="loadingText">Mengambil data dari server Garena...</div>
+    <div class="loading" id="loadingText">Menghubungi Server Garena...</div>
 
     <!-- Tampilan Hasil -->
     <div class="result-card" id="resultCard">
@@ -215,35 +215,57 @@
             return;
         }
 
-        // Tampilkan animasi loading, sembunyikan hasil sebelumnya
         loadingText.style.display = 'block';
         resultCard.style.display = 'none';
 
-        try {
-            // Menggunakan API publik terintegrasi pihak ketiga untuk mengecek ID Free Fire
-            const apiUrl = `https://api.zoneid.my.id/api/game/freefire?id=${idInput}`;
-            
-            const response = await fetch(apiUrl);
-            const data = await response.json();
+        // Menggunakan CORS proxy publik gratisan untuk menghindari pemblokiran browser
+        const proxyUrl = "https://corsproxy.io/?"; 
+        
+        // Daftar Multi-API URL (Jika API 1 gagal, otomatis coba API 2)
+        const apiEndpoints = [
+            `https://api.zoneid.my.id/api/game/freefire?id=${idInput}`,
+            `https://freefireinfo-zy9l.onrender.com/api/v1/search-players?id=${idInput}`
+        ];
 
-            // Memeriksa keberadaan data username/nickname dari respon API
-            if (data && (data.nickname || (data.result && data.result.username))) {
-                const gameNickname = data.nickname || data.result.username;
+        let success = false;
+        let nicknameAsli = "";
+
+        // Looping pengecekan link API
+        for (let url of apiEndpoints) {
+            try {
+                // Menembak API lewat jalur Proxy Bypass CORS
+                const response = await fetch(proxyUrl + encodeURIComponent(url));
+                if (!response.ok) continue;
                 
-                document.getElementById('resNickname').innerText = gameNickname;
-                document.getElementById('resID').innerText = idInput;
-                
-                // Menampilkan panel kartu hasil
-                resultCard.style.display = 'block';
-            } else {
-                alert('ID tidak ditemukan atau sistem sedang sibuk. Silakan coba beberapa saat lagi.');
+                const data = await response.json();
+
+                // Deteksi pembacaan properti berdasarkan struktur JSON response masing-masing API
+                if (data.nickname) {
+                    nicknameAsli = data.nickname;
+                    success = true;
+                    break;
+                } else if (data.result && data.result.username) {
+                    nicknameAsli = data.result.username;
+                    success = true;
+                    break;
+                } else if (data.player_name) {
+                    nicknameAsli = data.player_name;
+                    success = true;
+                    break;
+                }
+            } catch (err) {
+                console.warn("Mencoba server cadangan karena terjadi kendala...");
             }
-        } catch (error) {
-            console.error("Kesalahan API:", error);
-            alert('Gagal mengambil data dari server. Pastikan koneksi internet aktif.');
-        } finally {
-            // Sembunyikan tulisan loading setelah proses selesai
-            loadingText.style.display = 'none';
+        }
+
+        loadingText.style.display = 'none';
+
+        if (success) {
+            document.getElementById('resNickname').innerText = nicknameAsli;
+            document.getElementById('resID').innerText = idInput;
+            resultCard.style.display = 'block';
+        } else {
+            alert('Gagal mengambil data dari server. Seluruh jalur API publik sedang padat atau ID yang kamu masukkan salah. Silakan coba sesaat lagi!');
         }
     }
 </script>
