@@ -3,150 +3,257 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Fire ID Checker Interface</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Free Fire ID Checker - Ice Blue Dragon</title>
     <style>
+        /* --- CSS THEME: ICE BLUE DRAGON --- */
         body {
-            background-color: #121214;
+            background-color: #0b0f19;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-image: radial-gradient(circle at center, #102a45 0%, #050914 100%);
         }
-        .bg-card-dark {
-            background-color: #1e1e22;
+
+        .container {
+            background: linear-gradient(135deg, rgba(16, 37, 66, 0.7) 0%, rgba(7, 18, 36, 0.9) 100%);
+            border: 2px solid #4facfe;
+            box-shadow: 0 0 20px rgba(79, 172, 254, 0.4), inset 0 0 15px rgba(0, 242, 254, 0.2);
+            border-radius: 16px;
+            padding: 25px;
+            width: 100%;
+            max-width: 450px;
+            backdrop-filter: blur(10px);
         }
-        .orange-glow {
-            box-shadow: 0 0 15px rgba(249, 115, 22, 0.2);
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #00f2fe;
+            text-shadow: 0 0 8px rgba(0, 242, 254, 0.6);
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background: rgba(5, 15, 30, 0.8);
+            border: 1px solid #4facfe;
+            border-radius: 8px;
+            padding: 12px;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input[type="text"]:focus {
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+            border-color: #00f2fe;
+        }
+
+        button {
+            background: linear-gradient(45deg, #00c6ff, #0072ff);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 12px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        button:hover {
+            background: linear-gradient(45deg, #00f2fe, #4facfe);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.7);
+        }
+
+        /* --- RESULT CARD PANEL --- */
+        .result-card {
+            display: none; /* Sembunyikan sampai data ditemukan */
+            border: 1px solid rgba(79, 172, 254, 0.4);
+            background: rgba(10, 25, 47, 0.6);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid rgba(79, 172, 254, 0.3);
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        .dragon-avatar {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #00f2fe;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #071529;
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
+        }
+
+        .nickname {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .user-id {
+            font-size: 14px;
+            color: #a0aec0;
+            margin: 2px 0 0 0;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .info-box {
+            background: rgba(5, 15, 30, 0.7);
+            border: 1px solid rgba(79, 172, 254, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: #00f2fe;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .loading {
+            text-align: center;
+            color: #00f2fe;
+            display: none;
+            margin: 10px 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
-<body class="text-gray-200 font-sans min-h-screen pb-10">
+<body>
 
-    <div class="max-w-md mx-auto px-4 pt-4">
-        <!-- Input Section Card -->
-        <div class="bg-card-dark rounded-xl p-4 border border-gray-800 shadow-lg">
-            
-            <!-- Header Input -->
-            <div class="flex items-center gap-2 mb-3 text-sm text-gray-400 font-medium">
-                <i class="fa-solid fa-id-card text-orange-500"></i>
-                <span>Masukkan Free Fire ID</span>
-            </div>
-
-            <!-- Input Box & Button -->
-            <div class="flex gap-2 mb-6">
-                <input 
-                    type="number" 
-                    id="ff-id-input" 
-                    value="1263383781" 
-                    class="flex-1 bg-[#151518] border border-gray-700 rounded-lg px-3 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 text-sm tracking-wider"
-                    placeholder="Masukkan ID Akun..."
-                >
-                <button 
-                    onclick="checkId()" 
-                    class="bg-orange-500 hover:bg-orange-600 text-black font-bold px-4 py-2.5 rounded-lg text-xs flex items-center gap-1.5 transition duration-200 orange-glow uppercase"
-                >
-                    <i class="fa-solid fa-magnifying-glass text-[10px]"></i> Cek ID
-                </button>
-            </div>
-
-            <!-- Profile Info Header -->
-            <div class="flex justify-between items-start mb-6">
-                <div class="flex items-center gap-3">
-                    <!-- Avatar -->
-                    <div class="relative w-14 h-14 rounded-xl overflow-hidden border border-gray-600 bg-zinc-800 flex items-center justify-center">
-                        <i class="fa-solid fa-user-secret text-2xl text-gray-400"></i>
-                    </div>
-                    <!-- Nickname & ID -->
-                    <div>
-                        <h2 class="text-lg font-bold text-white flex items-center gap-1">
-                            Naraa'★
-                        </h2>
-                        <p class="text-xs text-gray-500 tracking-wide" id="display-id">1263383781</p>
-                    </div>
-                </div>
-
-                <!-- Guild Badge -->
-                <div class="bg-[#151518] border border-gray-800 p-2 rounded-lg flex items-center gap-2 max-w-[150px]">
-                    <i class="fa-solid fa-shield-halved text-yellow-500 text-lg"></i>
-                    <div class="leading-tight">
-                        <div class="text-[11px] font-bold text-gray-300 truncate">TGR • Kaltim</div>
-                        <span class="text-[9px] text-blue-400 underline block cursor-pointer">Lihat Clan</span>
-                        <div class="flex items-center justify-between text-[9px] text-gray-500 mt-1 gap-4">
-                            <span>Level <span class="text-yellow-500 font-bold">4</span></span>
-                            <span>10/50</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <hr class="border-gray-800 my-4">
-
-            <!-- Estimation & Created Date -->
-            <div class="grid grid-cols-2 gap-4 mb-6 text-xs">
-                <div>
-                    <span class="text-gray-500 block mb-1 text-[10px] uppercase tracking-wider font-semibold">
-                        <i class="fa-solid fa-wallet text-yellow-600 mr-1"></i> Estimasi Topup Kamu
-                    </span>
-                    <span class="text-white font-bold text-sm">Rp 34.991.000</span>
-                </div>
-                <div>
-                    <span class="text-gray-500 block mb-1 text-[10px] uppercase tracking-wider font-semibold">
-                        <i class="fa-solid fa-calendar-days text-emerald-600 mr-1"></i> Dibuat Pada
-                    </span>
-                    <span class="text-white font-medium block">Minggu, 4 Agustus 2019</span>
-                    <span class="text-[10px] text-gray-500 block">2539 hari yang lalu</span>
-                </div>
-            </div>
-
-            <!-- Signature / Bio -->
-            <div class="bg-[#151518] p-3 rounded-lg border border-gray-800 mb-6">
-                <span class="text-[9px] text-yellow-600 font-bold block mb-1 tracking-wider uppercase">Signature / Bio</span>
-                <p class="text-xs text-gray-400 italic">Imamෆ cinta ku muachh</p>
-            </div>
-
-            <!-- Stats Grid Box -->
-            <div class="grid grid-cols-4 gap-2 text-center text-xs">
-                <!-- Prime Level -->
-                <div class="bg-[#151518] p-2 rounded-lg border border-gray-800 flex flex-col justify-between h-16">
-                    <span class="text-[9px] text-gray-500 block">Prime Level</span>
-                    <span class="text-white font-bold text-sm text-yellow-500">8</span>
-                </div>
-                <!-- Jumlah Like -->
-                <div class="bg-[#151518] p-2 rounded-lg border border-gray-800 flex flex-col justify-between h-16">
-                    <span class="text-[9px] text-gray-500 block">Jumlah Like</span>
-                    <span class="text-white font-bold text-sm text-yellow-500">38.704</span>
-                </div>
-                <!-- Booyah Pass -->
-                <div class="bg-[#151518] p-2 rounded-lg border border-gray-800 flex flex-col justify-between h-16">
-                    <span class="text-[9px] text-gray-500 block">Booyah Pass</span>
-                    <span class="text-emerald-500 font-bold text-[11px]">Active</span>
-                    <span class="text-[9px] text-gray-500">Badge: 77</span>
-                </div>
-                <!-- Level Player -->
-                <div class="bg-[#151518] p-2 rounded-lg border border-gray-800 flex flex-col justify-between h-16">
-                    <span class="text-[9px] text-gray-500 block">Level Player</span>
-                    <span class="text-white font-bold text-sm">84</span>
-                </div>
-            </div>
-
-        </div>
+<div class="container">
+    <div class="header-title">
+        ❄️ Masukkan Free Fire ID
+    </div>
+    
+    <div class="input-group">
+        <input type="text" id="playerID" placeholder="Contoh: 123456789" autocomplete="off">
+        <button onclick="checkID()">CEK ID</button>
     </div>
 
-    <!-- JavaScript Simpel untuk Fungsi Tombol Cek ID -->
-    <script>
-        function checkId() {
-            const inputVal = document.getElementById('ff-id-input').value;
-            const displayId = document.getElementById('display-id');
-            
-            if(inputVal.trim() === "") {
-                alert("Silakan masukkan ID terlebih dahulu!");
-                return;
-            }
-            
-            // Mengubah tampilan ID sesuai input secara realtime (simulasi proses cek)
-            displayId.innerText = inputVal;
-            alert("Berhasil mengecek data untuk ID: " + inputVal);
+    <div class="loading" id="loadingText">Mengambil data dari server Garena...</div>
+
+    <!-- Tampilan Hasil -->
+    <div class="result-card" id="resultCard">
+        <div class="profile-section">
+            <div class="dragon-avatar">
+                🐉
+            </div>
+            <div>
+                <p class="nickname" id="resNickname">Naraa'★</p>
+                <p class="user-id" id="resID">123456789</p>
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-box">
+                <div class="info-label">Status Akun</div>
+                <div class="info-value" style="color: #4ed9a9;">Aktif</div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">Region</div>
+                <div class="info-value">Indonesia</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function checkID() {
+        const idInput = document.getElementById('playerID').value.trim();
+        const loadingText = document.getElementById('loadingText');
+        const resultCard = document.getElementById('resultCard');
+        
+        if (!idInput) {
+            alert('Silakan masukkan ID Free Fire terlebih dahulu!');
+            return;
         }
-    </script>
+
+        // Tampilkan loading, sembunyikan card hasil sebelumnya
+        loadingText.style.display = 'block';
+        resultCard.style.display = 'none';
+
+        try {
+            /* 
+              GANTI URL INI DENGAN ENDPOINT API YANG KAMU GUNAKAN
+              Contoh di bawah menggunakan permisalan struktur API topup/checker umum
+            */
+            const apiUrl = `https://api.contoh-checker.com/game/freefire?id=${idInput}`;
+            
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+
+            // Logika disesuaikan dengan respon JSON dari API yang kamu gunakan nanti
+            if (data.status === true || data.nickname) {
+                document.getElementById('resNickname').innerText = data.nickname;
+                document.getElementById('resID').innerText = idInput;
+                
+                // Tampilkan hasil
+                resultCard.style.style.display = 'block';
+            } else {
+                alert('ID tidak ditemukan atau API sedang gangguan.');
+            }
+        } catch (error) {
+            console.error(error);
+            // KARENA INI SIMULASI: Jika API belum siap / error, kita buat demo memunculkan data dummy agar visualnya terlihat
+            setTimeout(() => {
+                document.getElementById('resNickname').innerText = "Player_IceDragon";
+                document.getElementById('resID').innerText = idInput;
+                resultCard.style.display = 'block';
+                loadingText.style.display = 'none';
+            }, 1000);
+        } finally {
+            // Sembunyikan loading jika real API berjalan sukses
+            // loadingText.style.display = 'none';
+        }
+    }
+</script>
+
 </body>
 </html>
