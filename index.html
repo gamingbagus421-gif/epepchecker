@@ -186,8 +186,8 @@
                 🐉
             </div>
             <div>
-                <p class="nickname" id="resNickname">Naraa'★</p>
-                <p class="user-id" id="resID">123456789</p>
+                <p class="nickname" id="resNickname">-</p>
+                <p class="user-id" id="resID">-</p>
             </div>
         </div>
 
@@ -215,42 +215,35 @@
             return;
         }
 
-        // Tampilkan loading, sembunyikan card hasil sebelumnya
+        // Tampilkan animasi loading, sembunyikan hasil sebelumnya
         loadingText.style.display = 'block';
         resultCard.style.display = 'none';
 
         try {
-            /* 
-              GANTI URL INI DENGAN ENDPOINT API YANG KAMU GUNAKAN
-              Contoh di bawah menggunakan permisalan struktur API topup/checker umum
-            */
+            // Menggunakan API publik terintegrasi pihak ketiga untuk mengecek ID Free Fire
             const apiUrl = `https://api.zoneid.my.id/api/game/freefire?id=${idInput}`;
             
             const response = await fetch(apiUrl);
             const data = await response.json();
 
-            // Logika disesuaikan dengan respon JSON dari API yang kamu gunakan nanti
-            if (data.status === true || data.nickname) {
-                document.getElementById('resNickname').innerText = data.nickname;
+            // Memeriksa keberadaan data username/nickname dari respon API
+            if (data && (data.nickname || (data.result && data.result.username))) {
+                const gameNickname = data.nickname || data.result.username;
+                
+                document.getElementById('resNickname').innerText = gameNickname;
                 document.getElementById('resID').innerText = idInput;
                 
-                // Tampilkan hasil
-                resultCard.style.style.display = 'block';
+                // Menampilkan panel kartu hasil
+                resultCard.style.display = 'block';
             } else {
-                alert('ID tidak ditemukan atau API sedang gangguan.');
+                alert('ID tidak ditemukan atau sistem sedang sibuk. Silakan coba beberapa saat lagi.');
             }
         } catch (error) {
-            console.error(error);
-            // KARENA INI SIMULASI: Jika API belum siap / error, kita buat demo memunculkan data dummy agar visualnya terlihat
-            setTimeout(() => {
-                document.getElementById('resNickname').innerText = "Player_IceDragon";
-                document.getElementById('resID').innerText = idInput;
-                resultCard.style.display = 'block';
-                loadingText.style.display = 'none';
-            }, 1000);
+            console.error("Kesalahan API:", error);
+            alert('Gagal mengambil data dari server. Pastikan koneksi internet aktif.');
         } finally {
-            // Sembunyikan loading jika real API berjalan sukses
-            // loadingText.style.display = 'none';
+            // Sembunyikan tulisan loading setelah proses selesai
+            loadingText.style.display = 'none';
         }
     }
 </script>
