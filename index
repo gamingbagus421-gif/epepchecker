@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>NXR - FF Check (Backup)</title>
+<style>
+body { background:#0a0a0a; color:#0f0; font-family:monospace; padding:20px; }
+.container { max-width:600px; margin:auto; background:#111; padding:30px; border-radius:20px; border:2px solid #0f0; }
+input, button { width:100%; padding:15px; margin:10px 0; border-radius:10px; background:#222; color:#0f0; border:1px solid #0f04; font-size:16px; }
+button { background:#ff0044; color:#fff; font-weight:bold; cursor:pointer; }
+button:hover { background:#cc0033; }
+#result { margin-top:20px; background:#0a0a0a; padding:15px; border-radius:10px; border:1px solid #0f03; display:none; }
+#result.active { display:block; }
+.loading { text-align:center; padding:20px; animation:blink 1s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.error { color:#ff4444; text-align:center; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>⚡ NXR-BACKUP ⚡</h1>
+<input id="uid" placeholder="Masukkan UID (contoh: 1234567890)">
+<button id="cekBtn">🔍 CEK ID</button>
+<div id="result"></div>
+<div style="color:#888;font-size:12px;margin-top:10px;">✅ Menggunakan API cadangan yang lebih toleran</div>
+</div>
+<script>
+const uidInput = document.getElementById('uid');
+const cekBtn = document.getElementById('cekBtn');
+const resultDiv = document.getElementById('result');
+
+async function cekID() {
+  const uid = uidInput.value.trim();
+  if (!uid || uid.length < 5) {
+    alert('Masukkan UID yang valid!');
+    return;
+  }
+
+  cekBtn.disabled = true;
+  cekBtn.textContent = '⏳ MENCARI...';
+  resultDiv.innerHTML = `<div class="loading">⏳ Mengambil data UID ${uid}...</div>`;
+  resultDiv.classList.add('active');
+
+  // Daftar region yang dicoba otomatis
+  const regions = ['id', 'sg', 'my', 'ph', 'th', 'vn', 'ind', 'br', 'bd', 'pk', 'tw', 'us', 'eu', 'me', 'ru', 'cis'];
+  const regionNames = { id:'Indonesia', sg:'Singapura', my:'Malaysia', ph:'Filipina', th:'Thailand', vn:'Vietnam', ind:'India', br:'Brazil', bd:'Bangladesh', pk:'Pakistan', tw:'Taiwan', us:'USA', eu:'Eropa', me:'Timur Tengah', ru:'Rusia', cis:'CIS' };
+
+  try {
+    let found = false;
+    let lastError = '';
+
+    for (const region of regions) {
+      try {
+        const url = `https://free-ff-api-src-5plp.onrender.com/api/v1/account?region=${region.toUpperCase()}&uid=${uid}`;
+        const res = await fetch(url, { 
+          headers: { 'Accept': 'application/json' },
+          signal: AbortSignal.timeout(3000) 
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.basicInfo && data.basicInfo.nickname) {
+            found = true;
+            const player = data.basicInfo;
+            const clan = data.clanBasicInfo || {};
+            
+            resultDiv.innerHTML = `
+              <div style="border-bottom:1px solid #0f03;padding-bottom:10px;margin-bottom:10px;">
+                <div style="font-size:24px;font-weight:bold;">🎮 ${player.nickname}</div>
+                <div style="color:#888;">UID: ${uid}</div>
+                <div style="color:#88ff88;font-size:12px;">🌏 Region: ${regionNames[region] || region.toUpperCase()}</div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <div class="stat-card"><div class="label">Level</div><div class="value">${player.level || '-'}</div></div>
+                <div class="stat-card"><div class="label">❤️ Like</div><div class="value">${player.liked || player.like || '-'}</div></div>
+                <div class="stat-card"><div class="label">⭐ Prime</div><div class="value">${data.primeInfo?.primeLevel || player.primeLevel || '-'}</div></div>
+                <div class="stat-card"><div class="label">🏆 Rank BR</div><div class="value">${player.rank || player.brMaxRank || '-'}</div></div>
+                <div class="stat-card"><div class="label">⚔️ Rank CS</div><div class="value">${player.csRank || player.csMaxRank || '-'}</div></div>
+                <div class="stat-card"><div class="label">👥 Guild</div><div class="value">${clan.clanName || 'Tidak ada'}</div></div>
+              </div>
+            `;
+            resultDiv.classList.add('active');
+            break;
+          }
+        }
+      } catch (e) {
+        lastError = e.message;
+        continue;
+      }
+    }
+
+    if (!found) {
+      throw new Error(`UID tidak ditemukan di semua region. Terakhir: ${lastError}`);
+    }
+
+  } catch (error) {
+    resultDiv.innerHTML = `<div class="error">❌ Gagal: ${error.message}<br><br>💡 Pastikan UID benar dan coba lagi nanti.</div>`;
+    resultDiv.classList.add('active');
+  } finally {
+    cekBtn.disabled = false;
+    cekBtn.textContent = '🔍 CEK ID';
+  }
+}
+
+cekBtn.addEventListener('click', cekID);
+uidInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') cekID(); });
+</script>
+</body>
+</html>
