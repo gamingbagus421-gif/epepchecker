@@ -1,747 +1,901 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tensura FF Stalker - Real Time API</title>
-    <!-- Google Fonts & FontAwesome Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>NXR - FF Real Check</title>
     <style>
-        :root {
-            --bg-dark: #090e18;
-            --card-bg: rgba(18, 28, 47, 0.7);
-            --card-border: rgba(56, 189, 248, 0.2);
-            --rimuru-blue: #38bdf8;
-            --rimuru-dark-blue: #0284c7;
-            --tensura-gold: #fbbf24;
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
-            --success: #34d399;
-        }
-
+        /* ===== RESET ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             min-height: 100vh;
+            background: #0a0e1a;
+            color: #e0f0ff;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            padding: 40px 20px;
+            align-items: center;
+            padding: 20px;
             overflow-x: hidden;
-            position: relative;
         }
 
-        /* --- LIVE ANIME BACKGROUND EFFECT (TENSURA) --- */
-        .live-bg {
+        /* ===== LIVE BACKGROUND (PARTIKEL) ===== */
+        #particles-canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
-            overflow: hidden;
-            background: radial-gradient(circle at 50% 50%, #0d1e3d 0%, #060a12 100%);
+            z-index: 0;
+            pointer-events: none;
+            background: radial-gradient(ellipse at 30% 40%, #0b1a33, #030712);
         }
 
-        .slime-orb {
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, rgba(0,0,0,0) 70%);
-            top: -100px;
-            left: -100px;
-            border-radius: 50%;
-            animation: floatingSlime 15s infinite alternate ease-in-out;
-        }
-
-        .slime-orb.secondary {
-            bottom: -100px;
-            right: -100px;
-            background: radial-gradient(circle, rgba(2, 132, 199, 0.12) 0%, rgba(0,0,0,0) 70%);
-            animation: floatingSlime 20s infinite alternate-reverse ease-in-out;
-        }
-
-        @keyframes floatingSlime {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(50px, 50px) scale(1.1); }
-        }
-
-        /* --- APP CONTAINER --- */
+        /* ===== KONTAINER UTAMA ===== */
         .container {
-            width: 100%;
-            max-width: 900px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            z-index: 2;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 20px;
-            padding: 24px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-
-        /* --- SEARCH BOX --- */
-        .search-box {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .input-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 16px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-
-        .slime-text-icon {
-            color: var(--rimuru-blue);
-            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
-        }
-
-        .input-wrapper {
-            display: flex;
-            gap: 16px;
-        }
-
-        .field-container {
-            flex: 1;
             position: relative;
-            background: rgba(0, 0, 0, 0.25);
-            border: 1.5px solid rgba(56, 189, 248, 0.3);
-            border-radius: 14px;
+            z-index: 1;
+            max-width: 960px;
+            width: 100%;
+            background: rgba(8, 20, 48, 0.75);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-radius: 40px;
+            padding: 35px 30px;
+            border: 1px solid rgba(0, 180, 255, 0.25);
+            box-shadow: 0 20px 60px rgba(0, 80, 255, 0.25);
             transition: 0.3s;
         }
 
-        .field-container:focus-within {
-            border-color: var(--rimuru-blue);
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
-        }
-
-        .field-container input {
-            width: 100%;
-            background: transparent;
-            border: none;
-            outline: none;
-            padding: 16px 20px;
-            color: #fff;
-            font-size: 18px;
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
-
-        .field-container input::-webkit-outer-spin-button,
-        .field-container input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        #btn-search {
-            background: linear-gradient(135deg, var(--rimuru-blue) 0%, var(--rimuru-dark-blue) 100%);
-            border: none;
-            outline: none;
-            color: #fff;
-            padding: 0 32px;
-            font-size: 15px;
-            font-weight: 800;
-            border-radius: 14px;
-            cursor: pointer;
+        /* ===== HEADER ===== */
+        .header {
             display: flex;
             align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
-            transition: 0.3s ease;
-        }
-
-        #btn-search:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.6);
-            filter: brightness(1.1);
-        }
-
-        #btn-search:disabled {
-            background: #2e3a4e;
-            box-shadow: none;
-            cursor: not-allowed;
-        }
-
-        /* --- MAIN PROFILE HEADER CARD --- */
-        .main-profile {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
             flex-wrap: wrap;
-            gap: 20px;
         }
 
-        .profile-left {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .avatar-container {
-            position: relative;
-            width: 90px;
-            height: 90px;
-        }
-
-        .avatar-container img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--rimuru-blue);
-            z-index: 1;
-            position: relative;
-        }
-
-        .slime-glow {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--rimuru-blue);
-            border-radius: 50%;
-            filter: blur(8px);
-            opacity: 0.6;
-        }
-
-        .profile-info {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .profile-info h2 {
-            font-size: 26px;
+        .logo {
+            font-size: 32px;
             font-weight: 800;
+            background: linear-gradient(135deg, #38bdf8, #1d4ed8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             letter-spacing: -0.5px;
         }
 
-        .badge-row {
+        .logo span {
+            background: none;
+            -webkit-text-fill-color: #60a5fa;
+            font-weight: 300;
+        }
+
+        .badge-live {
+            background: #ef4444;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 30px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            animation: pulse-live 1.8s infinite;
+            box-shadow: 0 0 20px #ef444466;
+        }
+
+        @keyframes pulse-live {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(0.95);
+            }
+        }
+
+        /* ===== FORM ===== */
+        .search-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .search-form input,
+        .search-form select {
+            flex: 1;
+            min-width: 160px;
+            padding: 14px 18px;
+            border-radius: 16px;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            background: rgba(15, 30, 60, 0.6);
+            color: #e0f0ff;
+            font-size: 16px;
+            outline: none;
+            transition: 0.25s;
+            backdrop-filter: blur(4px);
+        }
+
+        .search-form input:focus,
+        .search-form select:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
+            background: rgba(15, 30, 60, 0.85);
+        }
+
+        .search-form select option {
+            background: #0b1a33;
+            color: #e0f0ff;
+        }
+
+        .search-form button {
+            padding: 14px 36px;
+            border: none;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #fff;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.25s;
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
             display: flex;
             align-items: center;
             gap: 8px;
-            margin: 2px 0;
+            white-space: nowrap;
         }
 
-        .f-badge {
-            background: var(--rimuru-blue);
-            color: #000;
-            width: 22px;
-            height: 22px;
-            border-radius: 6px;
+        .search-form button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 36px rgba(37, 99, 235, 0.45);
+        }
+
+        .search-form button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ===== LOADING ===== */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(56, 189, 248, 0.15);
+            border-top: 4px solid #38bdf8;
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading p {
+            color: #94a3b8;
+            font-size: 15px;
+        }
+
+        /* ===== ERROR ===== */
+        .error-message {
+            display: none;
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+            padding: 16px 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+
+        .error-message.active {
+            display: block;
+        }
+
+        /* ===== HASIL ===== */
+        .player-stats {
+            display: none;
+            animation: fadeUp 0.6s ease;
+        }
+
+        .player-stats.active {
+            display: block;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== PROFIL HEADER ===== */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 18px 20px;
+            background: rgba(15, 30, 60, 0.5);
+            border-radius: 24px;
+            border: 1px solid rgba(56, 189, 248, 0.12);
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .avatar-circle {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1d4ed8, #38bdf8);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 11px;
-            font-weight: 900;
-        }
-
-        .title-badge {
-            background: rgba(251, 191, 36, 0.15);
-            border: 1px solid var(--tensura-gold);
-            color: var(--tensura-gold);
-            padding: 2px 12px;
-            border-radius: 20px;
-            font-size: 12px;
+            font-size: 30px;
             font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+            box-shadow: 0 0 40px rgba(56, 189, 248, 0.25);
         }
 
-        .sub-uid {
-            color: var(--text-muted);
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .clan-box {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 16px;
-            padding: 16px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            min-width: 280px;
-        }
-
-        .clan-box img {
-            width: 50px;
-            height: 50px;
-            object-fit: contain;
-        }
-
-        .clan-details {
-            display: flex;
-            flex-direction: column;
+        .profile-info {
             flex: 1;
         }
 
-        .clan-details h4 {
-            font-size: 16px;
+        .profile-info .name {
+            font-size: 26px;
             font-weight: 700;
-            color: var(--tensura-gold);
+            color: #f0faff;
+            letter-spacing: -0.3px;
         }
 
-        .clan-link {
-            font-size: 12px;
-            color: var(--rimuru-blue);
-            text-decoration: none;
-            margin: 2px 0 6px 0;
+        .profile-info .meta {
             display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .clan-footer {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .slime-highlight {
-            color: var(--rimuru-blue);
-        }
-
-        /* --- SUMMARY GRID --- */
-        .summary-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            padding: 20px 24px;
-        }
-
-        .summary-item {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .sum-header {
-            font-size: 12px;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .text-yellow { color: var(--tensura-gold); }
-        .text-cyan { color: var(--rimuru-blue); }
-        .text-blue { color: #60a5fa; }
-        .text-orange { color: #fb923c; }
-        .text-gold { color: #eab308; }
-        .text-green { color: var(--success); }
-
-        .sum-value {
-            font-size: 28px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
-
-        .sum-value.size-medium {
-            font-size: 20px;
-        }
-
-        .sum-sub {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        /* --- BIO CARD --- */
-        .bio-card {
-            padding: 16px 24px;
-        }
-
-        .bio-title {
-            font-size: 11px;
-            font-weight: 800;
-            color: var(--tensura-gold);
-            letter-spacing: 1px;
-            margin-bottom: 6px;
-        }
-
-        .bio-card p {
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 4px;
             font-size: 14px;
-            color: #e5e7eb;
-            font-weight: 500;
-            white-space: pre-line;
+            color: #94a3b8;
         }
 
-        /* --- STATS GRID --- */
+        .profile-info .meta .badge {
+            background: rgba(56, 189, 248, 0.12);
+            padding: 2px 14px;
+            border-radius: 30px;
+            border: 1px solid rgba(56, 189, 248, 0.1);
+            font-size: 12px;
+            color: #93c5fd;
+        }
+
+        .signature {
+            margin-top: 6px;
+            font-style: italic;
+            color: #93c5fd;
+            font-size: 15px;
+            border-left: 3px solid #38bdf8;
+            padding-left: 14px;
+        }
+
+        /* ===== SECTION TITLE ===== */
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #93c5fd;
+            margin: 28px 0 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, rgba(56, 189, 248, 0.2), transparent);
+        }
+
+        /* ===== GRID STAT ===== */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
         }
 
         .stat-box {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 20px;
-            padding: 20px 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            background: rgba(15, 30, 60, 0.4);
+            border: 1px solid rgba(56, 189, 248, 0.08);
+            border-radius: 16px;
+            padding: 14px 12px;
             text-align: center;
-            min-height: 140px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            transition: 0.2s;
+            backdrop-filter: blur(4px);
         }
 
-        .stat-icon {
-            width: 36px;
-            height: 36px;
-            object-fit: contain;
-            margin-bottom: 8px;
+        .stat-box:hover {
+            border-color: rgba(56, 189, 248, 0.2);
+            background: rgba(15, 30, 60, 0.6);
         }
 
-        .stat-icon-fa {
-            font-size: 28px;
-            margin-bottom: 12px;
+        .stat-box .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f0faff;
+            word-break: break-word;
         }
 
-        .stat-label {
-            font-size: 12px;
-            color: var(--text-muted);
-            font-weight: 500;
-            margin-bottom: 4px;
+        .stat-box .stat-value.small {
+            font-size: 15px;
         }
 
-        .stat-number {
-            font-size: 24px;
-            font-weight: 800;
-        }
-
-        .stat-number.size-small {
-            font-size: 13px;
-            line-height: 1.4;
-            padding: 0 4px;
-        }
-
-        .stat-sub {
+        .stat-box .stat-label {
             font-size: 11px;
-            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
             margin-top: 4px;
         }
 
-        .bp-badge {
-            background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%);
-            border: 1px solid #60a5fa;
-            font-size: 10px;
-            font-weight: 900;
-            padding: 1px 6px;
-            border-radius: 4px;
-            margin-bottom: 10px;
+        /* ===== GUILD SPECIAL ===== */
+        .guild-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            background: rgba(15, 30, 60, 0.3);
+            border-radius: 20px;
+            padding: 18px 20px;
+            border: 1px solid rgba(56, 189, 248, 0.06);
+        }
+
+        .guild-stat {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .guild-stat .guild-stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #f0faff;
+        }
+
+        .guild-stat .guild-stat-label {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        .bp-badge small { font-size: 8px; font-weight: 500;}
 
-        #result-container {
-            display: none;
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 16px;
+            }
+            .profile-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .search-form button {
+                width: 100%;
+                justify-content: center;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .logo {
+                font-size: 24px;
+            }
         }
 
-        .fade-in {
-            animation: fadeInAnimation 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
         }
-
-        @keyframes fadeInAnimation {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
+        ::-webkit-scrollbar-track {
+            background: transparent;
         }
-
-        @media (max-width: 768px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .summary-grid { grid-template-columns: 1fr; }
-            .main-profile { flex-direction: column; align-items: flex-start; }
-            .clan-box { width: 100%; }
+        ::-webkit-scrollbar-thumb {
+            background: #1d4ed8;
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
 
-    <!-- Live Animated Background -->
-    <div class="live-bg">
-        <div class="slime-orb"></div>
-        <div class="slime-orb secondary"></div>
-        <div class="particles"></div>
-    </div>
+    <!-- ===== LIVE BACKGROUND ===== -->
+    <canvas id="particles-canvas"></canvas>
 
+    <!-- ===== MAIN ===== -->
     <div class="container">
-        <!-- Input Section -->
-        <div class="card search-box">
-            <div class="input-header">
-                <i class="fa-solid fa-address-card slime-text-icon"></i>
-                <span>Masukkan Free Fire ID</span>
-            </div>
-            <div class="input-wrapper">
-                <div class="field-container">
-                    <input type="number" id="player-id" placeholder="Masukkan Player ID..." value="12345678">
-                </div>
-                <button onclick="checkId()" id="btn-search">
-                    <i class="fa-solid fa-magnifying-glass"></i> CEK ID
-                </button>
-            </div>
+
+        <!-- HEADER -->
+        <div class="header">
+            <div class="logo">NXR<span>·REALM</span></div>
+            <div class="badge-live">● LIVE</div>
         </div>
 
-        <!-- Result Container -->
-        <div id="result-container">
-            
-            <!-- Main Profile Header Card -->
-            <div class="card main-profile">
-                <div class="profile-left">
-                    <div class="avatar-container">
-                        <img id="player-avatar" src="https://i.imgur.com/8QzQ2tH.png" alt="Avatar">
-                        <div class="slime-glow"></div>
-                    </div>
-                    <div class="profile-info">
-                        <h2 id="player-name">Name</h2>
-                        <div class="badge-row">
-                            <span class="f-badge"><i class="fa-solid fa-f"></i></span>
-                            <span class="title-badge" id="player-title">Player</span>
-                        </div>
-                        <p class="sub-uid" id="display-uid">00000000</p>
-                    </div>
-                </div>
+        <!-- FORM -->
+        <form class="search-form" id="searchForm">
+            <input type="text" id="playerUid" placeholder="UID (contoh: 7378196943)" value="7378196943" required />
+            <select id="region" required>
+                <option value="id">🇮🇩 Indonesia</option>
+                <option value="sg">🇸🇬 Singapura</option>
+                <option value="my">🇲🇾 Malaysia</option>
+                <option value="ph">🇵🇭 Filipina</option>
+                <option value="th">🇹🇭 Thailand</option>
+                <option value="vn">🇻🇳 Vietnam</option>
+                <option value="ind">🇮🇳 India</option>
+                <option value="br">🇧🇷 Brazil</option>
+                <option value="bd">🇧🇩 Bangladesh</option>
+                <option value="pk">🇵🇰 Pakistan</option>
+                <option value="tw">🇹🇼 Taiwan</option>
+                <option value="us">🇺🇸 USA</option>
+                <option value="eu">🇪🇺 Eropa</option>
+                <option value="me">🇸🇦 Timur Tengah</option>
+                <option value="ru">🇷🇺 Rusia</option>
+            </select>
+            <button type="submit" id="searchBtn">🔍 Cari</button>
+        </form>
 
-                <div class="clan-box">
-                    <img id="clan-logo" src="https://i.imgur.com/zWz2B3c.png" alt="Clan Banner">
-                    <div class="clan-details">
-                        <h4 id="clan-name">-</h4>
-                        <a href="#" class="clan-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> Lihat Clan</a>
-                        <div class="clan-footer">
-                            <span class="clan-lvl">Level <strong id="clan-level" class="slime-highlight">0</strong></span>
-                            <span class="clan-member" id="clan-members">0 / 0</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Topup Info & Account Age -->
-            <div class="card summary-grid">
-                <div class="summary-item">
-                    <div class="sum-header text-yellow">
-                        <i class="fa-solid fa-tags"></i> ESTIMASI TOPUP KAMU
-                    </div>
-                    <div class="sum-value" id="est-topup">Rp 0</div>
-                </div>
-                <div class="summary-item">
-                    <div class="sum-header text-cyan">
-                        <i class="fa-solid fa-calendar-days"></i> DIBUAT PADA
-                    </div>
-                    <div class="sum-value size-medium" id="created-date">-</div>
-                    <div class="sum-sub" id="days-ago">0 hari yang lalu</div>
-                </div>
-            </div>
-
-            <!-- Bio / Signature -->
-            <div class="card bio-card">
-                <div class="bio-title">SIGNATURE / BIO</div>
-                <p id="player-bio">-</p>
-            </div>
-
-            <!-- Grid 4x2 Stats Block -->
-            <div class="stats-grid">
-                <div class="stat-box">
-                    <img src="https://i.imgur.com/k6KxZ8Y.png" class="stat-icon" alt="Prime">
-                    <span class="stat-label">Prime Level</span>
-                    <span class="stat-number" id="stat-prime">0</span>
-                </div>
-                <div class="stat-box">
-                    <i class="fa-solid fa-thumbs-up stat-icon-fa text-yellow"></i>
-                    <span class="stat-label">Jumlah Like</span>
-                    <span class="stat-number" id="stat-likes">0</span>
-                </div>
-                <div class="stat-box">
-                    <span class="bp-badge">B <small>PREMIUM</small></span>
-                    <span class="stat-label">Booyah Pass</span>
-                    <span class="stat-number text-yellow" id="stat-bp">BooyahPass</span>
-                    <span class="stat-sub" id="stat-bp-badge">Badge: 0</span>
-                </div>
-                <div class="stat-box">
-                    <i class="fa-solid fa-gamepad stat-icon-fa text-blue"></i>
-                    <span class="stat-label">Level Player</span>
-                    <span class="stat-number" id="stat-level">0</span>
-                </div>
-
-                <div class="stat-box">
-                    <i class="fa-solid fa-envelope-open-text stat-icon-fa text-yellow"></i>
-                    <span class="stat-label">Exp Level</span>
-                    <span class="stat-number" id="stat-exp">0</span>
-                </div>
-                <div class="stat-box">
-                    <i class="fa-solid fa-gear stat-icon-fa text-orange"></i>
-                    <span class="stat-label">Terakhir Login</span>
-                    <span class="stat-number size-small" id="stat-last-login">-</span>
-                </div>
-                <div class="stat-box">
-                    <i class="fa-solid fa-earth-asia stat-icon-fa text-gold"></i>
-                    <span class="stat-label">Server Region</span>
-                    <span class="stat-number" id="stat-server">-</span>
-                </div>
-                <div class="stat-box">
-                    <i class="fa-solid fa-circle-check stat-icon-fa text-green"></i>
-                    <span class="stat-label">Credit Score</span>
-                    <span class="stat-number text-green" id="stat-credit">100</span>
-                    <span class="stat-sub">Reputation</span>
-                </div>
-            </div>
-
+        <!-- LOADING -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>⏳ Mengambil data dari server...</p>
         </div>
-    </div>
+
+        <!-- ERROR -->
+        <div class="error-message" id="errorMessage"></div>
+
+        <!-- HASIL -->
+        <div class="player-stats" id="playerStats">
+
+            <!-- PROFIL -->
+            <div class="profile-header">
+                <div class="avatar-circle" id="playerAvatar">?</div>
+                <div class="profile-info">
+                    <div class="name" id="playerName">—</div>
+                    <div class="meta">
+                        <span class="badge" id="levelBadge">Level —</span>
+                        <span class="badge" id="seasonBadge">Season —</span>
+                        <span class="badge" id="versionBadge">Version —</span>
+                        <span class="badge" id="playerRegion">Region —</span>
+                    </div>
+                    <div class="signature" id="signatureSection"></div>
+                </div>
+            </div>
+
+            <!-- STATS UMUM -->
+            <div class="section-title">📊 Statistik Umum</div>
+            <div class="stats-grid" id="generalStats"></div>
+
+            <!-- BATTLE ROYALE -->
+            <div class="section-title">🏆 Battle Royale</div>
+            <div class="stats-grid" id="brStats"></div>
+
+            <!-- CLASH SQUAD -->
+            <div class="section-title">⚔️ Clash Squad</div>
+            <div class="stats-grid" id="csStats"></div>
+
+            <!-- BATTLE PASS -->
+            <div class="section-title">🎖️ Battle Pass</div>
+            <div class="stats-grid" id="bpStats"></div>
+
+            <!-- CREDIT SCORE -->
+            <div class="section-title" id="creditTitle">💳 Credit Score</div>
+            <div class="stats-grid" id="creditSection"></div>
+
+            <!-- PET -->
+            <div class="section-title" id="petTitle">🐾 Pet</div>
+            <div class="stats-grid" id="petSection"></div>
+
+            <!-- GUILD -->
+            <div class="section-title">👥 Guild</div>
+            <div id="guildSection"></div>
+
+            <!-- CAPTAIN -->
+            <div class="section-title" id="captainTitle">👑 Captain Guild</div>
+            <div class="stats-grid" id="captainSection"></div>
+
+            <!-- EQUIPMENT -->
+            <div class="section-title">🎒 Equipment</div>
+            <div class="stats-grid" id="equipmentSection"></div>
+
+            <!-- DATES -->
+            <div class="section-title">📅 Tanggal</div>
+            <div class="stats-grid" id="dateStats"></div>
+
+            <!-- PREFERENCES -->
+            <div class="section-title">⚙️ Preferensi</div>
+            <div class="stats-grid" id="preferencesStats"></div>
+
+        </div><!-- end player-stats -->
+    </div><!-- end container -->
 
     <script>
-        const API_BASE = "https://proapis.hlgamingofficial.com";
-        const USER_UID = "PPG9XKhbO5Rj0kYztJ0Nakrw7ay1";
-        const API_KEY  = "GhAzCaNROZS1ELIh5Cu0AHYFE3SmXL";
+        // ============================================================
+        //  CONFIGURATION API (API BARU DARI YANG MULIA)
+        // ============================================================
+        const API_KEY = 'GhAzCaNROZS1ELIh5Cu0AHYFE3SmXL';
+        const USER_UID = 'PPG9XKhbO5Rj0kYztJ0Nakrw7ay1';
+        const API_BASE = 'https://proapis.hlgamingofficial.com/main/games/freefire/account/api';
 
-        // Menggunakan CORS Proxy publik yang handal untuk menembus proteksi browser
-        const PROXY_URL = "https://api.allorigins.win/get?url=";
+        // ============================================================
+        //  DOM
+        // ============================================================
+        const searchForm = document.getElementById('searchForm');
+        const loading = document.getElementById('loading');
+        const errorMessage = document.getElementById('errorMessage');
+        const playerStats = document.getElementById('playerStats');
+        const searchBtn = document.getElementById('searchBtn');
 
-        function createParticles() {
-            const container = document.querySelector('.particles');
-            if (!container) return;
-            const particleCount = 30;
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.style.position = 'absolute';
-                const size = Math.random() * 5 + 2;
-                particle.style.width = size + 'px';
-                particle.style.height = size + 'px';
-                const colors = ['rgba(56, 189, 248, ', 'rgba(14, 165, 233, ', 'rgba(168, 85, 247, '];
-                const randomColor = colors[Math.floor(Math.random() * colors.length)];
-                particle.style.background = randomColor + (Math.random() * 0.4 + 0.2) + ')';
-                particle.style.borderRadius = '50%';
-                particle.style.top = Math.random() * 100 + 'vh';
-                particle.style.left = Math.random() * 100 + 'vw';
-                particle.style.filter = 'blur(1px)';
-                container.appendChild(particle);
-                animateParticle(particle);
-            }
-        }
+        // ============================================================
+        //  SUBMIT
+        // ============================================================
+        searchForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-        function animateParticle(el) {
-            let startTop = parseFloat(el.style.top);
-            let speed = (Math.random() * 0.04) + 0.01;
-            function step() {
-                startTop -= speed;
-                if (startTop < -5) startTop = 105;
-                el.style.top = startTop + 'vh';
-                requestAnimationFrame(step);
-            }
-            requestAnimationFrame(step);
-        }
+            const uid = document.getElementById('playerUid').value.trim();
+            const region = document.getElementById('region').value;
 
-        async function checkId() {
-            const playerId = document.getElementById('player-id').value;
-            const btnSearch = document.getElementById('btn-search');
-            const resContainer = document.getElementById('result-container');
-            
-            if(!playerId) {
-                alert("Harap masukkan ID Free Fire terlebih dahulu!");
+            if (!uid || !region) {
+                showError('Harap isi semua field.');
                 return;
             }
 
-            btnSearch.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> BYPASS CORS...`;
-            btnSearch.disabled = true;
+            hideError();
+            hideStats();
+            showLoading();
+            searchBtn.disabled = true;
 
-            // Strategi Multi-Endpoint fallback jika /api/freefire tidak terdaftar di server HL Gaming
-            const endpoints = [
-                `/api/freefire?id=${playerId}&uid=${USER_UID}&key=${API_KEY}`,
-                `/api/stalk?id=${playerId}&uid=${USER_UID}&key=${API_KEY}`,
-                `/api/ff?id=${playerId}&uid=${USER_UID}&key=${API_KEY}`
-            ];
+            try {
+                const url =
+                    `${API_BASE}?sectionName=AllData&PlayerUid=${uid}&region=${region}&useruid=${USER_UID}&api=${API_KEY}`;
+                const response = await fetch(url);
 
-            let success = false;
-            let lastError = "";
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
 
-            for(let path of endpoints) {
-                try {
-                    const targetUrl = encodeURIComponent(API_BASE + path);
-                    const response = await fetch(PROXY_URL + targetUrl);
-                    
-                    if (!response.ok) continue;
+                const data = await response.json();
 
-                    const proxyData = await response.json();
-                    // AllOrigins membungkus respon asli di properti '.contents' berbentuk string JSON
-                    const resData = JSON.parse(proxyData.contents); 
-                    
-                    if (resData) {
-                        const data = resData.data || resData;
-                        
-                        // Menampilkan wadah data visual
-                        resContainer.style.display = 'block';
-                        resContainer.classList.remove('fade-in');
-                        void resContainer.offsetWidth;
-                        resContainer.classList.add('fade-in');
+                if (!data.result || !data.result.AccountInfo) {
+                    throw new Error('Akun tidak ditemukan');
+                }
 
-                        // Data Binding UI
-                        document.getElementById('display-uid').innerText = data.account_id || data.id || data.uid || playerId;
-                        document.getElementById('player-name').innerText = data.nickname || data.name || data.username || "N/A";
-                        document.getElementById('player-title').innerText = data.title || "GameMaster";
-                        
-                        document.getElementById('clan-name').innerText = data.clan_name || data.clan?.name || "Tidak Ada Clan";
-                        document.getElementById('clan-level').innerText = data.clan_level || data.clan?.level || "0";
-                        document.getElementById('clan-members').innerText = `${data.clan_member || data.clan?.members || 0} / 55`;
-                        
-                        document.getElementById('est-topup').innerText = data.estimated_topup || data.topup || "Rp 78.428.000";
-                        document.getElementById('created-date').innerText = data.created_at || "Kamis, 7 Desember 2017";
-                        document.getElementById('days-ago').innerText = data.account_age_days ? `${data.account_age_days} hari` : "3147 hari yang lalu";
-                        document.getElementById('player-bio').innerText = data.bio || data.signature || "Tidak ada Bio.";
-                        
-                        document.getElementById('stat-prime').innerText = data.prime_level || data.prime || "8";
-                        document.getElementById('stat-likes').innerText = Number(data.likes || data.like || 0).toLocaleString('id-ID');
-                        document.getElementById('stat-bp').innerText = data.booyah_pass || "BooyahPass";
-                        document.getElementById('stat-bp-badge').innerText = `Badge: ${data.bp_badge || data.badge || 83}`;
-                        document.getElementById('stat-level').innerText = data.level || "68";
-                        document.getElementById('stat-exp').innerText = Number(data.exp || 0).toLocaleString('id-ID');
-                        
-                        const now = new Date();
-                        const opsi = { year: 'numeric', month: 'long', day: 'numeric' };
-                        document.getElementById('stat-last-login').innerText = `${now.toLocaleDateString('id-ID', opsi)} pukul ${String(now.getHours()).padStart(2, '0')}.${String(now.getMinutes()).padStart(2, '0')}`;
-                        document.getElementById('stat-server').innerText = data.region || data.server || "Singapore (SG)";
-                        document.getElementById('stat-credit').innerText = data.credit_score || "100";
+                displayAllPlayerStats(data.result, region);
+            } catch (err) {
+                showError('Gagal mengambil data. Periksa UID dan region.');
+                console.error(err);
+            } finally {
+                hideLoading();
+                searchBtn.disabled = false;
+            }
+        });
 
-                        success = true;
-                        break; // Hentikan perulangan jika sudah sukses mengambil data
-                    }
-                } catch (err) {
-                    lastError = err.message;
+        // ============================================================
+        //  DISPLAY FUNCTIONS
+        // ============================================================
+        function displayAllPlayerStats(data, region) {
+            displayPlayerHeader(data.AccountInfo, region);
+            displaySignature(data.socialinfo);
+            displayGeneralStats(data.AccountInfo);
+            displayBRStats(data.AccountInfo);
+            displayCSStats(data.AccountInfo);
+            displayBPStats(data.AccountInfo);
+            displayCreditScore(data.creditScoreInfo);
+            displayPetInfo(data.petInfo);
+            displayGuildInfo(data.GuildInfo);
+            displayCaptainInfo(data.captainBasicInfo);
+            displayEquipment(data.AccountProfileInfo, data.AccountInfo);
+            displayDates(data.AccountInfo);
+            displayPreferences(data.socialinfo, data.AccountInfo);
+            showStats();
+        }
+
+        // --- HEADER ---
+        function displayPlayerHeader(account, region) {
+            const name = account.AccountName || 'Pemain Tidak Diketahui';
+            document.getElementById('playerName').textContent = name;
+            document.getElementById('playerRegion').textContent = `${region.toUpperCase()} • ID ${account.AccountType || 'N/A'}`;
+            document.getElementById('playerAvatar').textContent = name.charAt(0).toUpperCase();
+            document.getElementById('levelBadge').textContent = `Level ${account.AccountLevel || 0}`;
+            document.getElementById('seasonBadge').textContent = `Season ${account.AccountSeasonId || 0}`;
+            document.getElementById('versionBadge').textContent = account.ReleaseVersion || 'N/A';
+        }
+
+        // --- SIGNATURE ---
+        function displaySignature(social) {
+            const el = document.getElementById('signatureSection');
+            if (social?.AccountSignature) {
+                el.textContent = social.AccountSignature;
+                el.style.display = 'block';
+            } else {
+                el.style.display = 'none';
+            }
+        }
+
+        // --- GENERAL ---
+        function displayGeneralStats(account) {
+            document.getElementById('generalStats').innerHTML = `
+                ${stat(account.AccountLevel, 'Level')}
+                ${stat(account.AccountEXP?.toLocaleString(), 'EXP')}
+                ${stat(account.AccountLikes?.toLocaleString(), 'Like')}
+                ${stat(account.AccountType || 'N/A', 'Tipe Akun')}
+                ${stat(account.AccountRegion || 'N/A', 'Region', true)}
+                ${stat(account.ReleaseVersion || 'N/A', 'Versi', true)}
+            `;
+        }
+
+        // --- BR ---
+        function displayBRStats(a) {
+            document.getElementById('brStats').innerHTML = `
+                ${stat(a.BrMaxRank, 'Rank Max')}
+                ${stat(a.BrRankPoint?.toLocaleString(), 'Poin')}
+                ${stat(a.ShowBrRank ? '✅ Ya' : '❌ Tidak', 'Tampilkan Rank')}
+            `;
+        }
+
+        // --- CS ---
+        function displayCSStats(a) {
+            document.getElementById('csStats').innerHTML = `
+                ${stat(a.CsMaxRank, 'Rank Max')}
+                ${stat(a.CsRankPoint?.toLocaleString(), 'Poin')}
+                ${stat(a.ShowCsRank ? '✅ Ya' : '❌ Tidak', 'Tampilkan Rank')}
+            `;
+        }
+
+        // --- BP ---
+        function displayBPStats(a) {
+            document.getElementById('bpStats').innerHTML = `
+                ${stat(a.AccountBPBadges, 'Badges')}
+                ${stat(a.AccountBPid || 'N/A', 'ID BP', true)}
+                ${stat(a.AccountSeasonId, 'Season')}
+            `;
+        }
+
+        // --- CREDIT ---
+        function displayCreditScore(credit) {
+            const el = document.getElementById('creditSection');
+            const title = document.getElementById('creditTitle');
+            if (!credit) {
+                el.innerHTML = '';
+                title.style.display = 'none';
+                return;
+            }
+            title.style.display = 'flex';
+            el.innerHTML = `
+                ${stat(credit.creditScore, 'Credit Score')}
+            `;
+        }
+
+        // --- PET ---
+        function displayPetInfo(pet) {
+            const el = document.getElementById('petSection');
+            const title = document.getElementById('petTitle');
+            if (!pet?.id) {
+                el.innerHTML = '';
+                title.style.display = 'none';
+                return;
+            }
+            title.style.display = 'flex';
+            el.innerHTML = `
+                ${stat(pet.id, 'ID', true)}
+                ${stat(pet.level, 'Level')}
+                ${stat(pet.exp, 'EXP')}
+            `;
+        }
+
+        // --- GUILD ---
+        function displayGuildInfo(g) {
+            const el = document.getElementById('guildSection');
+            if (!g?.GuildName) {
+                el.innerHTML = '<p style="color:#94a3b8;padding:12px 0;">Tidak ada guild</p>';
+                return;
+            }
+            el.innerHTML = `
+                <div class="guild-info">
+                    <div class="guild-stat">
+                        <div class="guild-stat-value">${g.GuildName}</div>
+                        <div class="guild-stat-label">Nama Guild</div>
+                    </div>
+                    <div class="guild-stat">
+                        <div class="guild-stat-value">${g.GuildLevel}</div>
+                        <div class="guild-stat-label">Level Guild</div>
+                    </div>
+                    <div class="guild-stat">
+                        <div class="guild-stat-value">${g.GuildMemberNum || 0}</div>
+                        <div class="guild-stat-label">Anggota</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- CAPTAIN ---
+        function displayCaptainInfo(c) {
+            const el = document.getElementById('captainSection');
+            const title = document.getElementById('captainTitle');
+            if (!c?.nickname) {
+                el.innerHTML = '';
+                title.style.display = 'none';
+                return;
+            }
+            title.style.display = 'flex';
+            el.innerHTML = `
+                ${stat(c.nickname, 'Nama', true)}
+                ${stat(c.level, 'Level')}
+                ${stat(c.liked?.toLocaleString(), 'Like')}
+            `;
+        }
+
+        // --- EQUIPMENT ---
+        function displayEquipment(profile, account) {
+            const el = document.getElementById('equipmentSection');
+            let html = '';
+            html += stat(account.AccountAvatarId || 'N/A', 'Avatar', true);
+            html += stat(account.AccountBannerId || 'N/A', 'Banner', true);
+            if (profile?.EquippedOutfit) {
+                profile.EquippedOutfit.forEach((o, i) => {
+                    html += stat(o, `Outfit ${i + 1}`, true);
+                });
+            }
+            el.innerHTML = html || '<p style="color:#94a3b8;padding:12px 0;">Tidak ada data equipment</p>';
+        }
+
+        // --- DATES ---
+        function displayDates(a) {
+            document.getElementById('dateStats').innerHTML = `
+                ${stat(formatDate(a.AccountCreateTime), 'Dibuat', true)}
+                ${stat(formatDate(a.AccountLastLogin), 'Login Terakhir', true)}
+            `;
+        }
+
+        // --- PREFERENCES ---
+        function displayPreferences(s, a) {
+            document.getElementById('preferencesStats').innerHTML = `
+                ${stat(s?.AccountLanguage?.replace('Language_', '') || 'N/A', 'Bahasa', true)}
+                ${stat(s?.AccountPreferMode?.replace('Prefermode_', '') || 'N/A', 'Mode', true)}
+                ${stat(a.ShowBrRank ? '✅ Ya' : '❌ Tidak', 'Tampilkan BR')}
+                ${stat(a.ShowCsRank ? '✅ Ya' : '❌ Tidak', 'Tampilkan CS')}
+            `;
+        }
+
+        // ============================================================
+        //  UTILITY
+        // ============================================================
+        function stat(value, label, small = false) {
+            const val = (value ?? 'N/A');
+            return `
+                <div class="stat-box">
+                    <div class="stat-value ${small ? 'small' : ''}">${val}</div>
+                    <div class="stat-label">${label}</div>
+                </div>
+            `;
+        }
+
+        function formatDate(ts) {
+            if (!ts) return 'N/A';
+            try {
+                return new Date(ts * 1000).toLocaleString('id-ID');
+            } catch {
+                return 'N/A';
+            }
+        }
+
+        function showLoading() { loading.classList.add('active'); }
+
+        function hideLoading() { loading.classList.remove('active'); }
+
+        function showError(msg) {
+            errorMessage.textContent = msg;
+            errorMessage.classList.add('active');
+        }
+
+        function hideError() { errorMessage.classList.remove('active'); }
+
+        function showStats() { playerStats.classList.add('active'); }
+
+        function hideStats() { playerStats.classList.remove('active'); }
+
+        // ============================================================
+        //  LIVE BACKGROUND (PARTIKEL)
+        // ============================================================
+        (function initParticles() {
+            const canvas = document.getElementById('particles-canvas');
+            const ctx = canvas.getContext('2d');
+            let w, h;
+            const particles = [];
+            const COUNT = 80;
+
+            function resize() {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            class Particle {
+                constructor() {
+                    this.reset();
+                }
+                reset() {
+                    this.x = Math.random() * w;
+                    this.y = Math.random() * h;
+                    this.size = 1.5 + Math.random() * 3;
+                    this.speedX = (Math.random() - 0.5) * 0.4;
+                    this.speedY = (Math.random() - 0.5) * 0.4;
+                    this.opacity = 0.2 + Math.random() * 0.6;
+                }
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    if (this.x < 0 || this.x > w) this.speedX *= -1;
+                    if (this.y < 0 || this.y > h) this.speedY *= -1;
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(56, 189, 248, ${this.opacity * 0.7})`;
+                    ctx.fill();
+                    ctx.shadowColor = 'rgba(56, 189, 248, 0.15)';
+                    ctx.shadowBlur = 12;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
                 }
             }
 
-            if (!success) {
-                alert(`Gagal Stalk ID.\nSebab: Server API menolak / memblokir koneksi dari browser luar.\nDetail: ${lastError}`);
+            for (let i = 0; i < COUNT; i++) {
+                particles.push(new Particle());
             }
 
-            btnSearch.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> CEK ID`;
-            btnSearch.disabled = false;
-        }
+            function drawLines() {
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 130) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `rgba(56, 189, 248, ${0.08 * (1 - dist / 130)})`;
+                            ctx.lineWidth = 0.6;
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            createParticles();
-        });
+            function animate() {
+                ctx.clearRect(0, 0, w, h);
+                particles.forEach(p => { p.update();
+                    p.draw(); });
+                drawLines();
+                requestAnimationFrame(animate);
+            }
+            animate();
+        })();
     </script>
+
 </body>
 </html>
