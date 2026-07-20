@@ -3,272 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Fire ID Checker - Ice Blue Dragon</title>
-    <style>
-        /* --- CSS THEME: ICE BLUE DRAGON --- */
-        body {
-            background-color: #0b0f19;
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background-image: radial-gradient(circle at center, #102a45 0%, #050914 100%);
-        }
-
-        .container {
-            background: linear-gradient(135deg, rgba(16, 37, 66, 0.7) 0%, rgba(7, 18, 36, 0.9) 100%);
-            border: 2px solid #4facfe;
-            box-shadow: 0 0 20px rgba(79, 172, 254, 0.4), inset 0 0 15px rgba(0, 242, 254, 0.2);
-            border-radius: 16px;
-            padding: 25px;
-            width: 100%;
-            max-width: 450px;
-            backdrop-filter: blur(10px);
-        }
-
-        .header-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            color: #00f2fe;
-            text-shadow: 0 0 8px rgba(0, 242, 254, 0.6);
-            margin-bottom: 20px;
-        }
-
-        .input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        input[type="text"] {
-            flex: 1;
-            background: rgba(5, 15, 30, 0.8);
-            border: 1px solid #4facfe;
-            border-radius: 8px;
-            padding: 12px;
-            color: #fff;
-            font-size: 16px;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        input[type="text"]:focus {
-            box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
-            border-color: #00f2fe;
-        }
-
-        button {
-            background: linear-gradient(45deg, #00c6ff, #0072ff);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            padding: 12px 20px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-        }
-
-        button:hover {
-            background: linear-gradient(45deg, #00f2fe, #4facfe);
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.7);
-        }
-
-        /* --- RESULT CARD PANEL --- */
-        .result-card {
-            display: none;
-            border: 1px solid rgba(79, 172, 254, 0.4);
-            background: rgba(10, 25, 47, 0.6);
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 15px;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        .profile-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            border-bottom: 1px solid rgba(79, 172, 254, 0.3);
-            padding-bottom: 15px;
-            margin-bottom: 15px;
-        }
-
-        .dragon-avatar {
-            width: 50px;
-            height: 50px;
-            border: 2px solid #00f2fe;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #071529;
-            box-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
-        }
-
-        .nickname {
-            font-size: 20px;
-            font-weight: bold;
-            color: #ffffff;
-            margin: 0;
-        }
-
-        .user-id {
-            font-size: 14px;
-            color: #a0aec0;
-            margin: 2px 0 0 0;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .info-box {
-            background: rgba(5, 15, 30, 0.7);
-            border: 1px solid rgba(79, 172, 254, 0.2);
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .info-label {
-            font-size: 11px;
-            color: #00f2fe;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 5px;
-        }
-
-        .info-value {
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .loading {
-            text-align: center;
-            color: #00f2fe;
-            display: none;
-            margin: 10px 0;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+    <title>Free Fire ID Real-Time Checker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-slate-900 text-white flex items-center justify-center min-h-screen">
 
-<div class="container">
-    <div class="header-title">
-        ❄️ Masukkan Free Fire ID
-    </div>
-    
-    <div class="input-group">
-        <input type="text" id="playerID" placeholder="Contoh: 123456789" autocomplete="off">
-        <button onclick="checkID()">CEK ID</button>
-    </div>
-
-    <div class="loading" id="loadingText">Menghubungi Server Garena...</div>
-
-    <!-- Tampilan Hasil -->
-    <div class="result-card" id="resultCard">
-        <div class="profile-section">
-            <div class="dragon-avatar">
-                🐉
-            </div>
-            <div>
-                <p class="nickname" id="resNickname">-</p>
-                <p class="user-id" id="resID">-</p>
-            </div>
+    <div class="bg-slate-800 p-8 rounded-lg shadow-xl w-full max-w-md">
+        <h2 class="text-2xl font-bold mb-6 text-center text-orange-500">FF ID Checker</h2>
+        
+        <div class="mb-4">
+            <input type="text" id="playerID" placeholder="Masukkan Player ID FF..." class="w-full p-3 bg-slate-700 rounded border border-slate-600 focus:outline-none focus:border-orange-500">
         </div>
+        
+        <button onclick="checkID()" class="w-full bg-orange-500 hover:bg-orange-600 font-bold py-3 rounded transition duration-200">Periksa Sekarang</button>
 
-        <div class="info-grid">
-            <div class="info-box">
-                <div class="info-label">Status Akun</div>
-                <div class="info-value" style="color: #4ed9a9;">Aktif</div>
-            </div>
-            <div class="info-box">
-                <div class="info-label">Region</div>
-                <div class="info-value">Indonesia</div>
-            </div>
+        <!-- Tempat Menampilkan Hasil -->
+        <div id="result" class="mt-6 hidden border-t border-slate-700 pt-4">
+            <p class="mb-2"><strong>Nickname:</strong> <span id="resName" class="text-orange-400"></span></p>
+            <p class="mb-2"><strong>Level:</strong> <span id="resLevel"></span></p>
+            <p class="mb-2"><strong>Likes:</strong> <span id="resLikes"></span></p>
+            <p class="mb-2"><strong>Status Prime:</strong> <span id="resPrime"></span></p>
         </div>
     </div>
-</div>
 
-<script>
-    async function checkID() {
-        const idInput = document.getElementById('playerID').value.trim();
-        const loadingText = document.getElementById('loadingText');
-        const resultCard = document.getElementById('resultCard');
-        
-        if (!idInput) {
-            alert('Silakan masukkan ID Free Fire terlebih dahulu!');
-            return;
-        }
+    <script>
+        async function checkID() {
+            const id = document.getElementById('playerID').value;
+            if(!id) return alert('ID tidak boleh kosong!');
 
-        loadingText.style.display = 'block';
-        resultCard.style.display = 'none';
+            const resultDiv = document.getElementById('result');
+            resultDiv.classList.add('hidden');
 
-        // Menggunakan CORS proxy publik gratisan untuk menghindari pemblokiran browser
-        const proxyUrl = "https://corsproxy.io/?"; 
-        
-        // Daftar Multi-API URL (Jika API 1 gagal, otomatis coba API 2)
-        const apiEndpoints = [
-            `https://api.zoneid.my.id/api/game/freefire?id=${idInput}`,
-            `https://freefireinfo-zy9l.onrender.com/api/v1/search-players?id=${idInput}`
-        ];
-
-        let success = false;
-        let nicknameAsli = "";
-
-        // Looping pengecekan link API
-        for (let url of apiEndpoints) {
             try {
-                // Menembak API lewat jalur Proxy Bypass CORS
-                const response = await fetch(proxyUrl + encodeURIComponent(url));
-                if (!response.ok) continue;
-                
+                // Tembak ke backend buatan kita sendiri
+                const response = await fetch(`http://localhost:3000/api/check-ff/${id}`);
                 const data = await response.json();
 
-                // Deteksi pembacaan properti berdasarkan struktur JSON response masing-masing API
-                if (data.nickname) {
-                    nicknameAsli = data.nickname;
-                    success = true;
-                    break;
-                } else if (data.result && data.result.username) {
-                    nicknameAsli = data.result.username;
-                    success = true;
-                    break;
-                } else if (data.player_name) {
-                    nicknameAsli = data.player_name;
-                    success = true;
-                    break;
+                if(data.success) {
+                    document.getElementById('resName').innerText = data.nickname;
+                    document.getElementById('resLevel').innerText = data.level;
+                    document.getElementById('resLikes').innerText = data.likes;
+                    document.getElementById('resPrime').innerText = data.prime;
+                    resultDiv.classList.remove('hidden');
+                } else {
+                    alert('ID Tidak Ditemukan!');
                 }
-            } catch (err) {
-                console.warn("Mencoba server cadangan karena terjadi kendala...");
+            } catch (error) {
+                alert('Terjadi kesalahan koneksi.');
             }
         }
-
-        loadingText.style.display = 'none';
-
-        if (success) {
-            document.getElementById('resNickname').innerText = nicknameAsli;
-            document.getElementById('resID').innerText = idInput;
-            resultCard.style.display = 'block';
-        } else {
-            alert('Gagal mengambil data dari server. Seluruh jalur API publik sedang padat atau ID yang kamu masukkan salah. Silakan coba sesaat lagi!');
-        }
-    }
-</script>
-
+    </script>
 </body>
 </html>
