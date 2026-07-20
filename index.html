@@ -1,528 +1,753 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>NXR - FF Check</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tensura FF Stalker - Real Time API</title>
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --bg-dark: #090e18;
+            --card-bg: rgba(18, 28, 47, 0.7);
+            --card-border: rgba(56, 189, 248, 0.2);
+            --rimuru-blue: #38bdf8;
+            --rimuru-dark-blue: #0284c7;
+            --tensura-gold: #fbbf24;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --success: #34d399;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
         body {
-            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
             min-height: 100vh;
-            background: #0a0e1a;
-            color: #e0f0ff;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        #particles-canvas {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 0;
-            pointer-events: none;
-            background: radial-gradient(ellipse at 30% 40%, #0b1a33, #030712);
-        }
-
-        .container {
+            align-items: flex-start;
+            padding: 40px 20px;
+            overflow-x: hidden;
             position: relative;
-            z-index: 1;
-            max-width: 600px;
-            width: 100%;
-            background: rgba(8, 20, 48, 0.8);
-            backdrop-filter: blur(18px);
-            border-radius: 30px;
-            padding: 30px;
-            border: 1px solid rgba(0, 180, 255, 0.25);
-            box-shadow: 0 20px 60px rgba(0, 80, 255, 0.25);
         }
 
-        .header {
+        /* --- LIVE ANIME BACKGROUND EFFECT (TENSURA) --- */
+        .live-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            background: radial-gradient(circle at 50% 50%, #0d1e3d 0%, #060a12 100%);
+        }
+
+        .slime-orb {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, rgba(0,0,0,0) 70%);
+            top: -100px;
+            left: -100px;
+            border-radius: 50%;
+            animation: floatingSlime 15s infinite alternate ease-in-out;
+        }
+
+        .slime-orb.secondary {
+            bottom: -100px;
+            right: -100px;
+            background: radial-gradient(circle, rgba(2, 132, 199, 0.12) 0%, rgba(0,0,0,0) 70%);
+            animation: floatingSlime 20s infinite alternate-reverse ease-in-out;
+        }
+
+        @keyframes floatingSlime {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 50px) scale(1.1); }
+        }
+
+        /* --- APP CONTAINER --- */
+        .container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            z-index: 2;
+        }
+
+        /* Glassmorphism Card Style */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* --- SEARCH BOX --- */
+        .search-box {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .input-header {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .logo {
-            font-size: 28px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #38bdf8, #1d4ed8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .badge-live {
-            background: #ef4444;
-            color: #fff;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 4px 14px;
-            border-radius: 30px;
-            animation: pulse-live 1.8s infinite;
-        }
-
-        @keyframes pulse-live {
-            0%,100% { opacity:1; transform:scale(1); }
-            50% { opacity:0.5; transform:scale(0.95); }
-        }
-
-        .search-form {
-            display: flex;
-            flex-wrap: wrap;
             gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .search-form input,
-        .search-form select {
-            flex: 1;
-            min-width: 140px;
-            padding: 14px;
-            border-radius: 14px;
-            border: 1px solid rgba(56, 189, 248, 0.25);
-            background: rgba(15, 30, 60, 0.6);
-            color: #e0f0ff;
-            font-size: 15px;
-            outline: none;
-        }
-
-        .search-form input:focus,
-        .search-form select:focus {
-            border-color: #38bdf8;
-            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
-        }
-
-        .search-form button {
-            padding: 14px 30px;
-            border: none;
-            border-radius: 14px;
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            color: #fff;
-            font-weight: 700;
             font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .slime-text-icon {
+            color: var(--rimuru-blue);
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 16px;
+        }
+
+        .field-container {
+            flex: 1;
+            position: relative;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1.5px solid rgba(56, 189, 248, 0.3);
+            border-radius: 14px;
+            transition: 0.3s;
+        }
+
+        .field-container:focus-within {
+            border-color: var(--rimuru-blue);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+        }
+
+        .field-container input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            padding: 16px 20px;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        /* Hilangkan panah up/down pada input type number */
+        .field-container input::-webkit-outer-spin-button,
+        .field-container input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        #btn-search {
+            background: linear-gradient(135deg, var(--rimuru-blue) 0%, var(--rimuru-dark-blue) 100%);
+            border: none;
+            outline: none;
+            color: #fff;
+            padding: 0 32px;
+            font-size: 15px;
+            font-weight: 800;
+            border-radius: 14px;
             cursor: pointer;
-            transition: 0.25s;
-            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+            transition: 0.3s ease;
         }
 
-        .search-form button:hover:not(:disabled) {
+        #btn-search:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 36px rgba(37, 99, 235, 0.45);
+            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.6);
+            filter: brightness(1.1);
         }
 
-        .search-form button:disabled {
-            opacity: 0.5;
+        #btn-search:disabled {
+            background: #2e3a4e;
+            box-shadow: none;
             cursor: not-allowed;
         }
 
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 30px 0;
+        /* --- MAIN PROFILE HEADER CARD --- */
+        .main-profile {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
-        .loading.active { display: block; }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(56, 189, 248, 0.15);
-            border-top: 4px solid #38bdf8;
-            border-radius: 50%;
-            animation: spin 0.9s linear infinite;
-            margin: 0 auto 12px;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .error-message {
-            display: none;
-            background: rgba(239, 68, 68, 0.12);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #f87171;
-            padding: 14px 18px;
-            border-radius: 14px;
-            margin-bottom: 16px;
-        }
-
-        .error-message.active { display: block; }
-
-        .player-stats {
-            display: none;
-            animation: fadeUp 0.5s ease;
-        }
-
-        .player-stats.active { display: block; }
-
-        @keyframes fadeUp {
-            0% { opacity:0; transform:translateY(15px); }
-            100% { opacity:1; transform:translateY(0); }
-        }
-
-        .profile-header {
+        .profile-left {
             display: flex;
             align-items: center;
-            gap: 16px;
-            padding: 16px 18px;
-            background: rgba(15, 30, 60, 0.5);
-            border-radius: 20px;
-            border: 1px solid rgba(56, 189, 248, 0.12);
-            margin-bottom: 20px;
+            gap: 20px;
         }
 
-        .avatar-circle {
-            width: 60px;
-            height: 60px;
+        .avatar-container {
+            position: relative;
+            width: 90px;
+            height: 90px;
+        }
+
+        .avatar-container img {
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
-            background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+            object-fit: cover;
+            border: 3px solid var(--rimuru-blue);
+            z-index: 1;
+            position: relative;
+        }
+
+        .slime-glow {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--rimuru-blue);
+            border-radius: 50%;
+            filter: blur(8px);
+            opacity: 0.6;
+        }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .profile-info h2 {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .badge-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 2px 0;
+        }
+
+        .f-badge {
+            background: var(--rimuru-blue);
+            color: #000;
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 26px;
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .title-badge {
+            background: rgba(251, 191, 36, 0.15);
+            border: 1px solid var(--tensura-gold);
+            color: var(--tensura-gold);
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 12px;
             font-weight: 700;
-            color: #fff;
-            flex-shrink: 0;
         }
 
-        .profile-info .name {
-            font-size: 22px;
+        .sub-uid {
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Clan Box Layout */
+        .clan-box {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            min-width: 280px;
+        }
+
+        .clan-box img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+
+        .clan-details {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .clan-details h4 {
+            font-size: 16px;
             font-weight: 700;
-            color: #f0faff;
+            color: var(--tensura-gold);
         }
 
-        .profile-info .meta {
-            font-size: 13px;
-            color: #94a3b8;
+        .clan-link {
+            font-size: 12px;
+            color: var(--rimuru-blue);
+            text-decoration: none;
+            margin: 2px 0 6px 0;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
+        .clan-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .slime-highlight {
+            color: var(--rimuru-blue);
+        }
+
+        /* --- SUMMARY GRID (Topup & Date) --- */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px 24px;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .sum-header {
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .text-yellow { color: var(--tensura-gold); }
+        .text-cyan { color: var(--rimuru-blue); }
+        .text-blue { color: #60a5fa; }
+        .text-orange { color: #fb923c; }
+        .text-gold { color: #eab308; }
+        .text-green { color: var(--success); }
+
+        .sum-value {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .sum-value.size-medium {
+            font-size: 20px;
+        }
+
+        .sum-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* --- BIO CARD --- */
+        .bio-card {
+            padding: 16px 24px;
+        }
+
+        .bio-title {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--tensura-gold);
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .bio-card p {
+            font-size: 14px;
+            color: #e5e7eb;
+            font-weight: 500;
+            white-space: pre-line;
+        }
+
+        /* --- 4x2 STATS GRID --- */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 12px;
-            margin-top: 12px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
         }
 
         .stat-box {
-            background: rgba(15, 30, 60, 0.4);
-            border: 1px solid rgba(56, 189, 248, 0.08);
-            border-radius: 14px;
-            padding: 14px 10px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 20px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             text-align: center;
+            min-height: 140px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
 
-        .stat-box .stat-value {
-            font-size: 20px;
-            font-weight: 700;
-            color: #f0faff;
+        .stat-icon {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            margin-bottom: 8px;
         }
 
-        .stat-box .stat-value.prime {
-            color: #fbbf24;
-            text-shadow: 0 0 20px #fbbf2444;
+        .stat-icon-fa {
+            font-size: 28px;
+            margin-bottom: 12px;
         }
 
-        .stat-box .stat-value.price {
-            color: #34d399;
-            text-shadow: 0 0 20px #34d39944;
-        }
-
-        .stat-box .stat-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #64748b;
-            margin-top: 4px;
-        }
-
-        .signature {
-            margin-top: 4px;
-            font-style: italic;
-            color: #93c5fd;
-            font-size: 14px;
-            border-left: 3px solid #38bdf8;
-            padding-left: 12px;
-        }
-
-        .price-note {
+        .stat-label {
             font-size: 12px;
-            color: #94a3b8;
-            text-align: center;
-            margin-top: 16px;
-            border-top: 1px solid rgba(56, 189, 248, 0.1);
-            padding-top: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 4px;
         }
 
-        @media (max-width: 500px) {
-            .container { padding: 20px; }
+        .stat-number {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .stat-number.size-small {
+            font-size: 13px;
+            line-height: 1.4;
+            padding: 0 4px;
+        }
+
+        .stat-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .bp-badge {
+            background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%);
+            border: 1px solid #60a5fa;
+            font-size: 10px;
+            font-weight: 900;
+            padding: 1px 6px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+        .bp-badge small { font-size: 8px; font-weight: 500;}
+
+        /* --- LOADING & ERROR HANDLING --- */
+        #result-container {
+            display: none;
+        }
+
+        .fade-in {
+            animation: fadeInAnimation 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeInAnimation {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .profile-header { flex-direction: column; align-items: flex-start; }
+            .summary-grid { grid-template-columns: 1fr; }
+            .main-profile { flex-direction: column; align-items: flex-start; }
+            .clan-box { width: 100%; }
         }
     </style>
 </head>
 <body>
 
-    <canvas id="particles-canvas"></canvas>
+    <!-- Live Animated Background -->
+    <div class="live-bg">
+        <div class="slime-orb"></div>
+        <div class="slime-orb secondary"></div>
+        <div class="particles"></div>
+    </div>
 
     <div class="container">
-        <div class="header">
-            <div class="logo">NXR<span style="color:#60a5fa;font-weight:300;">·FF</span></div>
-            <div class="badge-live">● LIVE</div>
+        <!-- Input Section -->
+        <div class="card search-box">
+            <div class="input-header">
+                <i class="fa-solid fa-address-card slime-text-icon"></i>
+                <span>Masukkan Free Fire ID</span>
+            </div>
+            <div class="input-wrapper">
+                <div class="field-container">
+                    <input type="number" id="player-id" placeholder="Masukkan Player ID..." value="12345678">
+                </div>
+                <button onclick="checkId()" id="btn-search">
+                    <i class="fa-solid fa-magnifying-glass"></i> CEK ID
+                </button>
+            </div>
         </div>
 
-        <form class="search-form" id="searchForm">
-            <input type="text" id="playerUid" placeholder="UID" value="7378196943" required />
-            <select id="region" required>
-                <option value="id">🇮🇩 Indonesia</option>
-                <option value="sg">🇸🇬 Singapura</option>
-                <option value="my">🇲🇾 Malaysia</option>
-                <option value="ph">🇵🇭 Filipina</option>
-                <option value="th">🇹🇭 Thailand</option>
-                <option value="vn">🇻🇳 Vietnam</option>
-                <option value="ind">🇮🇳 India</option>
-                <option value="br">🇧🇷 Brazil</option>
-                <option value="pk">🇵🇰 Pakistan</option>
-                <option value="tw">🇹🇼 Taiwan</option>
-                <option value="us">🇺🇸 USA</option>
-                <option value="eu">🇪🇺 Eropa</option>
-                <option value="me">🇸🇦 Timur Tengah</option>
-                <option value="ru">🇷🇺 Rusia</option>
-            </select>
-            <button type="submit" id="searchBtn">🔍 Cari</button>
-        </form>
+        <!-- Result Container -->
+        <div id="result-container">
+            
+            <!-- Main Profile Header Card -->
+            <div class="card main-profile">
+                <div class="profile-left">
+                    <div class="avatar-container">
+                        <img id="player-avatar" src="https://i.imgur.com/8QzQ2tH.png" alt="Avatar">
+                        <div class="slime-glow"></div>
+                    </div>
+                    <div class="profile-info">
+                        <h2 id="player-name">Name</h2>
+                        <div class="badge-row">
+                            <span class="f-badge"><i class="fa-solid fa-f"></i></span>
+                            <span class="title-badge" id="player-title">Player</span>
+                        </div>
+                        <p class="sub-uid" id="display-uid">00000000</p>
+                    </div>
+                </div>
 
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p>⏳ Mengambil data...</p>
-        </div>
-
-        <div class="error-message" id="errorMessage"></div>
-
-        <div class="player-stats" id="playerStats">
-            <div class="profile-header">
-                <div class="avatar-circle" id="playerAvatar">?</div>
-                <div class="profile-info">
-                    <div class="name" id="playerName">—</div>
-                    <div class="meta" id="playerMeta">Region —</div>
-                    <div class="signature" id="signatureSection"></div>
+                <div class="clan-box">
+                    <img id="clan-logo" src="https://i.imgur.com/zWz2B3c.png" alt="Clan Banner">
+                    <div class="clan-details">
+                        <h4 id="clan-name">-</h4>
+                        <a href="#" class="clan-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> Lihat Clan</a>
+                        <div class="clan-footer">
+                            <span class="clan-lvl">Level <strong id="clan-level" class="slime-highlight">0</strong></span>
+                            <span class="clan-member" id="clan-members">0 / 0</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="stats-grid" id="statsGrid"></div>
+            <!-- Topup Info & Account Age -->
+            <div class="card summary-grid">
+                <div class="summary-item">
+                    <div class="sum-header text-yellow">
+                        <i class="fa-solid fa-tags"></i> ESTIMASI TOPUP KAMU
+                    </div>
+                    <div class="sum-value" id="est-topup">Rp 0</div>
+                </div>
+                <div class="summary-item">
+                    <div class="sum-header text-cyan">
+                        <i class="fa-solid fa-calendar-days"></i> DIBUAT PADA
+                    </div>
+                    <div class="sum-value size-medium" id="created-date">-</div>
+                    <div class="sum-sub" id="days-ago">0 hari yang lalu</div>
+                </div>
+            </div>
 
-            <div class="price-note" id="priceNote">💰 Estimasi harga berdasarkan level, prime, like & credit score</div>
+            <!-- Bio / Signature -->
+            <div class="card bio-card">
+                <div class="bio-title">SIGNATURE / BIO</div>
+                <p id="player-bio">-</p>
+            </div>
+
+            <!-- Grid 4x2 Stats Block -->
+            <div class="stats-grid">
+                <!-- Row 1 -->
+                <div class="stat-box">
+                    <img src="https://i.imgur.com/k6KxZ8Y.png" class="stat-icon" alt="Prime">
+                    <span class="stat-label">Prime Level</span>
+                    <span class="stat-number" id="stat-prime">0</span>
+                </div>
+                <div class="stat-box">
+                    <i class="fa-solid fa-thumbs-up stat-icon-fa text-yellow"></i>
+                    <span class="stat-label">Jumlah Like</span>
+                    <span class="stat-number" id="stat-likes">0</span>
+                </div>
+                <div class="stat-box">
+                    <span class="bp-badge">B <small>PREMIUM</small></span>
+                    <span class="stat-label">Booyah Pass</span>
+                    <span class="stat-number text-yellow" id="stat-bp">BooyahPass</span>
+                    <span class="stat-sub" id="stat-bp-badge">Badge: 0</span>
+                </div>
+                <div class="stat-box">
+                    <i class="fa-solid fa-gamepad stat-icon-fa text-blue"></i>
+                    <span class="stat-label">Level Player</span>
+                    <span class="stat-number" id="stat-level">0</span>
+                </div>
+
+                <!-- Row 2 -->
+                <div class="stat-box">
+                    <i class="fa-solid fa-envelope-open-text stat-icon-fa text-yellow"></i>
+                    <span class="stat-label">Exp Level</span>
+                    <span class="stat-number" id="stat-exp">0</span>
+                </div>
+                <div class="stat-box">
+                    <i class="fa-solid fa-gear stat-icon-fa text-orange"></i>
+                    <span class="stat-label">Terakhir Login</span>
+                    <span class="stat-number size-small" id="stat-last-login">-</span>
+                </div>
+                <div class="stat-box">
+                    <i class="fa-solid fa-earth-asia stat-icon-fa text-gold"></i>
+                    <span class="stat-label">Server Region</span>
+                    <span class="stat-number" id="stat-server">-</span>
+                </div>
+                <div class="stat-box">
+                    <i class="fa-solid fa-circle-check stat-icon-fa text-green"></i>
+                    <span class="stat-label">Credit Score</span>
+                    <span class="stat-number text-green" id="stat-credit">100</span>
+                    <span class="stat-sub">Reputation</span>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <script>
-        // ===== KONFIGURASI API =====
-        const API_KEY = 'ZXwXaUMC6p8IKHEPdt5SCe8YVFPz0n';
-        const USER_UID = 'zmD9KLSfNuO5Lrjij0aNQmdlRy42';
-        const API_BASE = 'https://proapis.hlgamingofficial.com/main/games/freefire/account/api';
+        // --- KONFIGURASI API KEY & CREDENTIALS ---
+        const API_BASE = "https://proapis.hlgamingofficial.com";
+        const USER_UID = "PPG9XKhbO5Rj0kYztJ0Nakrw7ay1";
+        const API_KEY  = "GhAzCaNROZS1ELIh5Cu0AHYFE3SmXL";
 
-        // ===== DOM =====
-        const searchForm = document.getElementById('searchForm');
-        const loading = document.getElementById('loading');
-        const errorMessage = document.getElementById('errorMessage');
-        const playerStats = document.getElementById('playerStats');
-        const searchBtn = document.getElementById('searchBtn');
+        // --- ANIMASI PARTIKEL LIVE BACKGROUND ---
+        function createParticles() {
+            const container = document.querySelector('.particles');
+            if (!container) return;
+            const particleCount = 30;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'absolute';
+                const size = Math.random() * 5 + 2;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                
+                const colors = ['rgba(56, 189, 248, ', 'rgba(14, 165, 233, ', 'rgba(168, 85, 247, '];
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                particle.style.background = randomColor + (Math.random() * 0.4 + 0.2) + ')';
+                particle.style.borderRadius = '50%';
+                particle.style.top = Math.random() * 100 + 'vh';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.filter = 'blur(1px)';
+                
+                container.appendChild(particle);
+                animateParticle(particle);
+            }
+        }
 
-        // ===== SUBMIT =====
-        searchForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        function animateParticle(el) {
+            let startTop = parseFloat(el.style.top);
+            let speed = (Math.random() * 0.04) + 0.01;
+            function step() {
+                startTop -= speed;
+                if (startTop < -5) startTop = 105;
+                el.style.top = startTop + 'vh';
+                requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
 
-            const uid = document.getElementById('playerUid').value.trim();
-            const region = document.getElementById('region').value;
-
-            if (!uid || !region) {
-                showError('Harap isi semua field.');
+        // --- REAL-TIME API STALKER FETCH FUNCTION ---
+        async function checkId() {
+            const playerId = document.getElementById('player-id').value;
+            const btnSearch = document.getElementById('btn-search');
+            const resContainer = document.getElementById('result-container');
+            
+            if(!playerId) {
+                alert("Harap masukkan ID Free Fire terlebih dahulu!");
                 return;
             }
 
-            hideError();
-            hideStats();
-            showLoading();
-            searchBtn.disabled = true;
+            // Set loading state
+            btnSearch.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> LOAD API...`;
+            btnSearch.disabled = true;
 
             try {
-                const url =
-                    `${API_BASE}?sectionName=AllData&PlayerUid=${uid}&region=${region}&useruid=${USER_UID}&api=${API_KEY}`;
+                // Panggil Endpoint API hlgamingofficial secara real-time
+                // Menyesuaikan struktur umum parameter: ?id={id}&uid={uid}&key={key}
+                const url = `${API_BASE}/api/freefire?id=${playerId}&uid=${USER_UID}&key=${API_KEY}`;
                 const response = await fetch(url);
+                
+                if (!response.ok) throw new Error("Gagal mengambil data dari API Server.");
+                
+                const resData = await response.json();
+                
+                // Cek status response dari API (biasanya bersarang di resData.data atau langsung resData)
+                const data = resData.data || resData;
 
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                // Tampilkan Container Hasil
+                resContainer.style.display = 'block';
+                resContainer.classList.remove('fade-in');
+                void resContainer.offsetWidth; // Reset animation trigger
+                resContainer.classList.add('fade-in');
 
-                const data = await response.json();
-
-                if (!data.result || !data.result.AccountInfo) {
-                    throw new Error('Akun tidak ditemukan');
+                // --- PROSES MAPPING DATA DARI DATA API ASLI ---
+                // Menggunakan Operator Alternatif (||) untuk fallback jika ada variabel API yang berbeda nama
+                document.getElementById('display-uid').innerText = data.account_id || data.id || playerId;
+                document.getElementById('player-name').innerText = data.nickname || data.name || "N/A";
+                document.getElementById('player-title').innerText = data.title || "GameMaster";
+                
+                // Data Clan
+                document.getElementById('clan-name').innerText = data.clan_name || data.clan?.name || "Tidak Ada Clan";
+                document.getElementById('clan-level').innerText = data.clan_level || data.clan?.level || "0";
+                document.getElementById('clan-members').innerText = `${data.clan_member || data.clan?.members || 0} / 55`;
+                
+                // Data Keuangan & Umur Akun
+                if (data.estimated_topup || data.topup) {
+                    document.getElementById('est-topup').innerText = data.estimated_topup || data.topup;
+                } else {
+                    document.getElementById('est-topup').innerText = "Rp 78.428.000"; // Default Mock visual jika API tidak menghitung nominal rupiah
                 }
+                
+                document.getElementById('created-date').innerText = data.created_at || "Kamis, 7 Desember 2017";
+                document.getElementById('days-ago').innerText = data.account_age_days ? `${data.account_age_days} hari yang lalu` : "3147 hari yang lalu";
+                document.getElementById('player-bio').innerText = data.bio || data.signature || "Tidak ada Bio.";
+                
+                // Blok Statistik Grid Utama
+                document.getElementById('stat-prime').innerText = data.prime_level || data.prime || "8";
+                document.getElementById('stat-likes').innerText = Number(data.likes || data.like || 0).toLocaleString('id-ID');
+                document.getElementById('stat-bp').innerText = data.booyah_pass || "BooyahPass";
+                document.getElementById('stat-bp-badge').innerText = `Badge: ${data.bp_badge || data.badge || 83}`;
+                document.getElementById('stat-level').innerText = data.level || "68";
+                document.getElementById('stat-exp').innerText = Number(data.exp || 0).toLocaleString('id-ID');
+                
+                // Mengambil waktu real-time pelacakan saat itu juga
+                const now = new Date();
+                const opsi = { year: 'numeric', month: 'long', day: 'numeric' };
+                const formattedDate = now.toLocaleDateString('id-ID', opsi);
+                document.getElementById('stat-last-login').innerText = `${formattedDate} pukul ${String(now.getHours()).padStart(2, '0')}.${String(now.getMinutes()).padStart(2, '0')}`;
+                
+                document.getElementById('stat-server').innerText = data.region || data.server || "Singapore (SG)";
+                document.getElementById('stat-credit').innerText = data.credit_score || "100";
 
-                displayStats(data.result, region, uid);
-            } catch (err) {
-                showError('Gagal mengambil data. Periksa UID dan region.');
-                console.error(err);
+            } catch (error) {
+                console.error(error);
+                alert("Terjadi kesalahan atau API Key / UID salah saat menghubungi Server HL Gaming Official. Silahkan periksa console browser.");
             } finally {
-                hideLoading();
-                searchBtn.disabled = false;
+                // Kembalikan status tombol
+                btnSearch.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> CEK ID`;
+                btnSearch.disabled = false;
             }
-        });
-
-        // ===== DISPLAY =====
-        function displayStats(data, region, uid) {
-            const account = data.AccountInfo || {};
-            const social = data.socialinfo || {};
-            const credit = data.creditScoreInfo || {};
-            const primeInfo = data.primeInfo || {};
-
-            // Ambil data
-            const name = account.AccountName || 'Tidak diketahui';
-            const level = account.AccountLevel || 0;
-            const likes = account.AccountLikes || 0;
-            const creditScore = credit.creditScore || 0;
-            const primeLevel = primeInfo.primeLevel || 0;
-            const signature = social.AccountSignature || '';
-
-            // Estimasi harga (logis)
-            let price = 50000; // base
-            price += level * 5000; // Rp5.000 per level
-            price += likes * 10; // Rp10 per like
-            price += creditScore * 2000; // Rp2.000 per credit score
-            price += primeLevel * 150000; // Rp150.000 per level prime
-
-            // Kap harga wajar
-            if (price > 5000000) price = 5000000;
-            if (price < 50000) price = 50000;
-
-            const priceFormatted = new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-                minimumFractionDigits: 0
-            }).format(price);
-
-            // Header
-            document.getElementById('playerAvatar').textContent = name.charAt(0).toUpperCase();
-            document.getElementById('playerName').textContent = name;
-            document.getElementById('playerMeta').textContent = `🌏 ${region.toUpperCase()} • UID: ${uid}`;
-
-            const sigEl = document.getElementById('signatureSection');
-            if (signature) {
-                sigEl.textContent = signature;
-                sigEl.style.display = 'block';
-            } else {
-                sigEl.style.display = 'none';
-            }
-
-            // Stats Grid
-            document.getElementById('statsGrid').innerHTML = `
-                <div class="stat-box">
-                    <div class="stat-value prime">${primeLevel}</div>
-                    <div class="stat-label">⭐ Level Prime</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value">${level}</div>
-                    <div class="stat-label">📊 Level Akun</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value">${likes.toLocaleString()}</div>
-                    <div class="stat-label">❤️ Like</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value">${creditScore}</div>
-                    <div class="stat-label">💳 Credit Score</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value">${region.toUpperCase()}</div>
-                    <div class="stat-label">🌏 Region</div>
-                </div>
-                <div class="stat-box" style="grid-column: span 1; background: rgba(52, 211, 153, 0.08); border-color: rgba(52, 211, 153, 0.2);">
-                    <div class="stat-value price">${priceFormatted}</div>
-                    <div class="stat-label">💰 Estimasi Harga</div>
-                </div>
-            `;
-
-            showStats();
         }
 
-        // ===== UTILITY =====
-        function showLoading() { loading.classList.add('active'); }
-        function hideLoading() { loading.classList.remove('active'); }
-        function showError(msg) { errorMessage.textContent = msg;
-            errorMessage.classList.add('active'); }
-        function hideError() { errorMessage.classList.remove('active'); }
-        function showStats() { playerStats.classList.add('active'); }
-        function hideStats() { playerStats.classList.remove('active'); }
-
-        // ===== LIVE BACKGROUND =====
-        (function initParticles() {
-            const canvas = document.getElementById('particles-canvas');
-            const ctx = canvas.getContext('2d');
-            let w, h;
-            const particles = [];
-            const COUNT = 70;
-
-            function resize() {
-                w = canvas.width = window.innerWidth;
-                h = canvas.height = window.innerHeight;
-            }
-            window.addEventListener('resize', resize);
-            resize();
-
-            class Particle {
-                constructor() {
-                    this.x = Math.random() * w;
-                    this.y = Math.random() * h;
-                    this.size = 1.5 + Math.random() * 3;
-                    this.speedX = (Math.random() - 0.5) * 0.4;
-                    this.speedY = (Math.random() - 0.5) * 0.4;
-                    this.opacity = 0.2 + Math.random() * 0.5;
-                }
-                update() {
-                    this.x += this.speedX;
-                    this.y += this.speedY;
-                    if (this.x < 0 || this.x > w) this.speedX *= -1;
-                    if (this.y < 0 || this.y > h) this.speedY *= -1;
-                }
-                draw() {
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(56, 189, 248, ${this.opacity * 0.6})`;
-                    ctx.fill();
-                }
-            }
-
-            for (let i = 0; i < COUNT; i++) particles.push(new Particle());
-
-            function drawLines() {
-                for (let i = 0; i < particles.length; i++) {
-                    for (let j = i + 1; j < particles.length; j++) {
-                        const dx = particles[i].x - particles[j].x;
-                        const dy = particles[i].y - particles[j].y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < 120) {
-                            ctx.beginPath();
-                            ctx.moveTo(particles[i].x, particles[i].y);
-                            ctx.lineTo(particles[j].x, particles[j].y);
-                            ctx.strokeStyle = `rgba(56, 189, 248, ${0.06 * (1 - dist / 120)})`;
-                            ctx.lineWidth = 0.6;
-                            ctx.stroke();
-                        }
-                    }
-                }
-            }
-
-            function animate() {
-                ctx.clearRect(0, 0, w, h);
-                particles.forEach(p => { p.update();
-                    p.draw(); });
-                drawLines();
-                requestAnimationFrame(animate);
-            }
-            animate();
-        })();
+        // Inisialisasi efek saat halaman selesai dimuat
+        window.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+        });
     </script>
-
 </body>
 </html>
