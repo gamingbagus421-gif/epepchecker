@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>BAYS - FF Simple Check & Valuation</title>
+    <title>BAY - FF Simple Check & Valuation</title>
     <style>
         /* ===== RESET ===== */
         * {
@@ -244,11 +244,12 @@
 
     <div class="container">
         <div class="header">
-            <div class="logo">@BAYS<span>·CHECKER</span></div>
+            <div class="logo">ABAY<span>·CHECKER</span></div>
         </div>
 
         <form class="search-form" id="searchForm">
-            <input type="text" id="playerUid" placeholder="Masukkan UID Akun Free Fire" value="7378196943" required />
+            <!-- value default sudah dihapus di bawah ini -->
+            <input type="text" id="playerUid" placeholder="Masukkan UID Akun Free Fire" required />
             <button type="submit" id="searchBtn">🔍 Periksa</button>
         </form>
 
@@ -325,32 +326,24 @@
         const playerStats = document.getElementById('playerStats');
         const searchBtn = document.getElementById('searchBtn');
 
-        // Fungsi Auto-detect Region Berdasarkan Digit Awal UID Free Fire
         function detectRegionByUid(uid) {
             if (!uid) return 'id';
             const firstDigit = uid.charAt(0);
             
-            // Aturan pemetaan regional internal database Free Fire
             const regionMap = {
-                '7': 'id',  // Indonesia
-                '8': 'id',  // Indonesia
-                '1': 'sg',  // Singapore / MYSG
-                '2': 'vn',  // Vietnam
-                '3': 'th',  // Thailand
-                '4': 'br',  // Brazil
-                '5': 'us',  // USA / NA
-                '6': 'eu',  // Eropa
-                '9': 'ind'  // India / Bangladesh
+                '7': 'id', '8': 'id',
+                '1': 'sg', '2': 'vn',
+                '3': 'th', '4': 'br',
+                '5': 'us', '6': 'eu',
+                '9': 'ind'
             };
             
-            return regionMap[firstDigit] || 'id'; // default fallback ke id (Indonesia)
+            return regionMap[firstDigit] || 'id';
         }
 
         searchForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const uid = document.getElementById('playerUid').value.trim();
-            
-            // Auto detect region server
             const detectedRegion = detectRegionByUid(uid);
 
             if (!uid) {
@@ -394,16 +387,13 @@
             document.getElementById('displayUid').textContent = `UID: ${uid}`;
             document.getElementById('playerAvatar').textContent = name.charAt(0).toUpperCase();
 
-            // 1. Level Player & EXP
             const level = acc.AccountLevel || 0;
             document.getElementById('resLevel').textContent = level;
             document.getElementById('resExp').textContent = acc.AccountEXP ? acc.AccountEXP.toLocaleString('id-ID') : '0';
 
-            // 2. Jumlah Like
             const likes = acc.AccountLikes || 0;
             document.getElementById('resLikes').textContent = likes.toLocaleString('id-ID');
 
-            // 3. Level Prime (Kalkulasi Otomatis Skala 1 - 8 berdasarkan performa/level akun)
             let primeLevel = 1;
             if (level > 80 || likes > 30000) primeLevel = 8;
             else if (level > 70 || likes > 20000) primeLevel = 7;
@@ -414,19 +404,15 @@
             else if (level > 15) primeLevel = 2;
             document.getElementById('resPrime').textContent = primeLevel;
 
-            // 4. Booyah Pas (ON/OFF)
             const isBooyahOn = acc.AccountBPBadges && acc.AccountBPBadges > 0;
             const booyahEl = document.getElementById('resBooyah');
             booyahEl.textContent = isBooyahOn ? '🟢 ON' : '🔴 OFF';
 
-            // 5. Server Region
             const regionNames = { id: 'Indonesia 🇮🇩', sg: 'Singapore 🇸🇬', vn: 'Vietnam 🇻🇳', th: 'Thailand 🇹🇭', br: 'Brazil 🇧🇷', us: 'USA 🇺🇸', eu: 'Europe 🇪🇺', ind: 'India 🇮🇳' };
             document.getElementById('resRegion').textContent = regionNames[region] || region.toUpperCase();
 
-            // 6. Credit Score
             document.getElementById('resCredit').textContent = credit?.creditScore || '100';
 
-            // 7. Last Login
             if (acc.AccountLastLogin) {
                 const date = new Date(acc.AccountLastLogin * 1000);
                 document.getElementById('resLastLogin').textContent = date.toLocaleDateString('id-ID', {month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'});
@@ -434,11 +420,9 @@
                 document.getElementById('resLastLogin').textContent = 'N/A';
             }
 
-            // 8. Rumus Estimasi Harga Pasar Akun (Level, Likes, & Faktor Prime)
             let basePrice = (level * 3000) + (likes * 15) + (primeLevel * 25000);
-            if (isBooyahOn) basePrice += 45000; // Bonus nilai jika BP sedang aktif
+            if (isBooyahOn) basePrice += 45000;
             
-            // Format Rupiah
             const formattedPrice = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(basePrice);
             document.getElementById('estimatedPrice').textContent = formattedPrice;
 
@@ -452,7 +436,6 @@
         function showStats() { playerStats.classList.add('active'); }
         function hideStats() { playerStats.classList.remove('active'); }
 
-        // Live Canvas Background Animation Code
         (function() {
             const canvas = document.getElementById('particles-canvas');
             const ctx = canvas.getContext('2d');
