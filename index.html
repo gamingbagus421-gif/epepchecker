@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>NXR - FF Real Check</title>
+    <title>NXR - FF Simple Check & Valuation</title>
     <style>
         /* ===== RESET ===== */
         * {
@@ -24,7 +24,6 @@
             overflow-x: hidden;
         }
 
-        /* ===== LIVE BACKGROUND (PARTIKEL) ===== */
         #particles-canvas {
             position: fixed;
             top: 0;
@@ -36,38 +35,33 @@
             background: radial-gradient(ellipse at 30% 40%, #0b1a33, #030712);
         }
 
-        /* ===== KONTAINER UTAMA ===== */
         .container {
             position: relative;
             z-index: 1;
-            max-width: 960px;
+            max-width: 600px;
             width: 100%;
             background: rgba(8, 20, 48, 0.75);
             backdrop-filter: blur(18px);
             -webkit-backdrop-filter: blur(18px);
-            border-radius: 40px;
-            padding: 35px 30px;
+            border-radius: 30px;
+            padding: 30px;
             border: 1px solid rgba(0, 180, 255, 0.25);
             box-shadow: 0 20px 60px rgba(0, 80, 255, 0.25);
-            transition: 0.3s;
         }
 
-        /* ===== HEADER ===== */
         .header {
             display: flex;
             align-items: center;
             gap: 12px;
             margin-bottom: 25px;
-            flex-wrap: wrap;
         }
 
         .logo {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 800;
             background: linear-gradient(135deg, #38bdf8, #1d4ed8);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
         }
 
         .logo span {
@@ -76,278 +70,158 @@
             font-weight: 300;
         }
 
-        .badge-live {
-            background: #ef4444;
-            color: #fff;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 4px 14px;
-            border-radius: 30px;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            animation: pulse-live 1.8s infinite;
-            box-shadow: 0 0 20px #ef444466;
-        }
-
-        @keyframes pulse-live {
-            0%,
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 0.5;
-                transform: scale(0.95);
-            }
-        }
-
-        /* ===== FORM ===== */
         .search-form {
             display: flex;
-            flex-wrap: wrap;
             gap: 12px;
             margin-bottom: 25px;
         }
 
-        .search-form input,
-        .search-form select {
+        .search-form input {
             flex: 1;
-            min-width: 160px;
             padding: 14px 18px;
-            border-radius: 16px;
+            border-radius: 14px;
             border: 1px solid rgba(56, 189, 248, 0.25);
             background: rgba(15, 30, 60, 0.6);
             color: #e0f0ff;
             font-size: 16px;
             outline: none;
-            transition: 0.25s;
-            backdrop-filter: blur(4px);
         }
 
-        .search-form input:focus,
-        .search-form select:focus {
+        .search-form input:focus {
             border-color: #38bdf8;
             box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
-            background: rgba(15, 30, 60, 0.85);
-        }
-
-        .search-form select option {
-            background: #0b1a33;
-            color: #e0f0ff;
         }
 
         .search-form button {
-            padding: 14px 36px;
+            padding: 14px 28px;
             border: none;
-            border-radius: 16px;
+            border-radius: 14px;
             background: linear-gradient(135deg, #2563eb, #1d4ed8);
             color: #fff;
             font-weight: 700;
             font-size: 16px;
             cursor: pointer;
-            transition: 0.25s;
             box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            white-space: nowrap;
         }
 
-        .search-form button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 36px rgba(37, 99, 235, 0.45);
-        }
-
-        .search-form button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* ===== LOADING ===== */
         .loading {
             display: none;
             text-align: center;
-            padding: 40px 0;
+            padding: 20px 0;
         }
 
-        .loading.active {
-            display: block;
-        }
+        .loading.active { display: block; }
 
         .spinner {
-            width: 48px;
-            height: 48px;
+            width: 36px;
+            height: 36px;
             border: 4px solid rgba(56, 189, 248, 0.15);
             border-top: 4px solid #38bdf8;
             border-radius: 50%;
             animation: spin 0.9s linear infinite;
-            margin: 0 auto 16px;
+            margin: 0 auto 12px;
         }
 
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .loading p {
-            color: #94a3b8;
-            font-size: 15px;
-        }
-
-        /* ===== ERROR ===== */
         .error-message {
             display: none;
             background: rgba(239, 68, 68, 0.12);
             border: 1px solid rgba(239, 68, 68, 0.3);
             color: #f87171;
-            padding: 16px 20px;
-            border-radius: 16px;
+            padding: 14px;
+            border-radius: 14px;
             margin-bottom: 20px;
-            font-size: 15px;
         }
 
-        .error-message.active {
-            display: block;
-        }
+        .error-message.active { display: block; }
 
-        /* ===== HASIL ===== */
         .player-stats {
             display: none;
-            animation: fadeUp 0.6s ease;
         }
 
-        .player-stats.active {
-            display: block;
+        .player-stats.active { display: block; }
+
+        /* ===== PRICE ESTIMATION CARD ===== */
+        .price-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(4, 120, 87, 0.3));
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(4, 120, 87, 0.2);
         }
 
-        @keyframes fadeUp {
-            0% {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .price-card .price-title {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #a7f3d0;
+            margin-bottom: 4px;
         }
 
-        /* ===== PROFIL HEADER ===== */
+        .price-card .price-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #10b981;
+            text-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+        }
+
+        /* ===== PROFILE BLOCK ===== */
         .profile-header {
             display: flex;
             align-items: center;
-            gap: 20px;
-            padding: 18px 20px;
+            gap: 16px;
+            padding: 16px;
             background: rgba(15, 30, 60, 0.5);
-            border-radius: 24px;
+            border-radius: 18px;
             border: 1px solid rgba(56, 189, 248, 0.12);
-            margin-bottom: 24px;
-            flex-wrap: wrap;
+            margin-bottom: 20px;
         }
 
         .avatar-circle {
-            width: 72px;
-            height: 72px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
             background: linear-gradient(135deg, #1d4ed8, #38bdf8);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 30px;
+            font-size: 24px;
             font-weight: 700;
             color: #fff;
-            flex-shrink: 0;
-            box-shadow: 0 0 40px rgba(56, 189, 248, 0.25);
-        }
-
-        .profile-info {
-            flex: 1;
         }
 
         .profile-info .name {
-            font-size: 26px;
+            font-size: 22px;
             font-weight: 700;
             color: #f0faff;
-            letter-spacing: -0.3px;
         }
 
-        .profile-info .meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 4px;
-            font-size: 14px;
-            color: #94a3b8;
+        .profile-info .uid-tag {
+            font-size: 13px;
+            color: #64748b;
         }
 
-        .profile-info .meta .badge {
-            background: rgba(56, 189, 248, 0.12);
-            padding: 2px 14px;
-            border-radius: 30px;
-            border: 1px solid rgba(56, 189, 248, 0.1);
-            font-size: 12px;
-            color: #93c5fd;
-        }
-
-        .signature {
-            margin-top: 6px;
-            font-style: italic;
-            color: #93c5fd;
-            font-size: 15px;
-            border-left: 3px solid #38bdf8;
-            padding-left: 14px;
-        }
-
-        /* ===== SECTION TITLE ===== */
-        .section-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #93c5fd;
-            margin: 28px 0 16px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-title::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(to right, rgba(56, 189, 248, 0.2), transparent);
-        }
-
-        /* ===== GRID STAT ===== */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 12px;
         }
 
         .stat-box {
             background: rgba(15, 30, 60, 0.4);
             border: 1px solid rgba(56, 189, 248, 0.08);
-            border-radius: 16px;
-            padding: 14px 12px;
+            border-radius: 14px;
+            padding: 14px;
             text-align: center;
-            transition: 0.2s;
-            backdrop-filter: blur(4px);
-        }
-
-        .stat-box:hover {
-            border-color: rgba(56, 189, 248, 0.2);
-            background: rgba(15, 30, 60, 0.6);
         }
 
         .stat-box .stat-value {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
             color: #f0faff;
-            word-break: break-word;
-        }
-
-        .stat-box .stat-value.small {
-            font-size: 15px;
         }
 
         .stat-box .stat-label {
@@ -358,208 +232,129 @@
             margin-top: 4px;
         }
 
-        /* ===== GUILD SPECIAL ===== */
-        .guild-info {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            background: rgba(15, 30, 60, 0.3);
-            border-radius: 20px;
-            padding: 18px 20px;
-            border: 1px solid rgba(56, 189, 248, 0.06);
-        }
-
-        .guild-stat {
-            flex: 1;
-            min-width: 120px;
-        }
-
-        .guild-stat .guild-stat-value {
-            font-size: 22px;
-            font-weight: 700;
-            color: #f0faff;
-        }
-
-        .guild-stat .guild-stat-label {
-            font-size: 12px;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px 16px;
-            }
-            .profile-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .search-form button {
-                width: 100%;
-                justify-content: center;
-            }
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .logo {
-                font-size: 24px;
-            }
-        }
-
-        /* ===== SCROLLBAR ===== */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #1d4ed8;
-            border-radius: 10px;
+        @media (max-width: 480px) {
+            .search-form { flex-direction: column; }
+            .stats-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== LIVE BACKGROUND ===== -->
     <canvas id="particles-canvas"></canvas>
 
-    <!-- ===== MAIN ===== -->
     <div class="container">
-
-        <!-- HEADER -->
         <div class="header">
-            <div class="logo">NXR<span>·REALM</span></div>
-            <div class="badge-live">● LIVE</div>
+            <div class="logo">NXR<span>·CHECKER</span></div>
         </div>
 
-        <!-- FORM -->
         <form class="search-form" id="searchForm">
-            <input type="text" id="playerUid" placeholder="UID (contoh: 7378196943)" value="7378196943" required />
-            <select id="region" required>
-                <option value="id">🇮🇩 Indonesia</option>
-                <option value="sg">🇸🇬 Singapura</option>
-                <option value="my">🇲🇾 Malaysia</option>
-                <option value="ph">🇵🇭 Filipina</option>
-                <option value="th">🇹🇭 Thailand</option>
-                <option value="vn">🇻🇳 Vietnam</option>
-                <option value="ind">🇮🇳 India</option>
-                <option value="br">🇧🇷 Brazil</option>
-                <option value="bd">🇧🇩 Bangladesh</option>
-                <option value="pk">🇵🇰 Pakistan</option>
-                <option value="tw">🇹🇼 Taiwan</option>
-                <option value="us">🇺🇸 USA</option>
-                <option value="eu">🇪🇺 Eropa</option>
-                <option value="me">🇸🇦 Timur Tengah</option>
-                <option value="ru">🇷🇺 Rusia</option>
-            </select>
-            <button type="submit" id="searchBtn">🔍 Cari</button>
+            <input type="text" id="playerUid" placeholder="Masukkan UID Akun Free Fire" value="7378196943" required />
+            <button type="submit" id="searchBtn">🔍 Periksa</button>
         </form>
 
-        <!-- LOADING -->
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <p>⏳ Mengambil data dari server...</p>
+            <p>⏳ Menghubungkan ke database server...</p>
         </div>
 
-        <!-- ERROR -->
         <div class="error-message" id="errorMessage"></div>
 
-        <!-- HASIL -->
         <div class="player-stats" id="playerStats">
+            
+            <!-- ESTIMASI HARGA -->
+            <div class="price-card">
+                <div class="price-title">Estimasi Harga Akun</div>
+                <div class="price-value" id="estimatedPrice">Rp 0</div>
+            </div>
 
-            <!-- PROFIL -->
+            <!-- DETAIL AKUN -->
             <div class="profile-header">
                 <div class="avatar-circle" id="playerAvatar">?</div>
                 <div class="profile-info">
                     <div class="name" id="playerName">—</div>
-                    <div class="meta">
-                        <span class="badge" id="levelBadge">Level —</span>
-                        <span class="badge" id="seasonBadge">Season —</span>
-                        <span class="badge" id="versionBadge">Version —</span>
-                        <span class="badge" id="playerRegion">Region —</span>
-                    </div>
-                    <div class="signature" id="signatureSection"></div>
+                    <div class="uid-tag" id="displayUid">UID: —</div>
                 </div>
             </div>
 
-            <!-- STATS UMUM -->
-            <div class="section-title">📊 Statistik Umum</div>
-            <div class="stats-grid" id="generalStats"></div>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-value" id="resPrime">1</div>
+                    <div class="stat-label">✨ Level Prime</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="resLevel">0</div>
+                    <div class="stat-label">🏅 Level Player</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="resExp">0</div>
+                    <div class="stat-label">📈 EXP Level</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="resLikes">0</div>
+                    <div class="stat-label">❤️ Jumlah Like</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="resBooyah">OFF</div>
+                    <div class="stat-label">🏆 Booyah Pas</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="resRegion">ID</div>
+                    <div class="stat-label">🌍 Server Region</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="resCredit">0</div>
+                    <div class="stat-label">💳 Credit Score</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="resLastLogin" style="font-size: 13px;">—</div>
+                    <div class="stat-label">🕒 Last Login</div>
+                </div>
+            </div>
 
-            <!-- BATTLE ROYALE -->
-            <div class="section-title">🏆 Battle Royale</div>
-            <div class="stats-grid" id="brStats"></div>
-
-            <!-- CLASH SQUAD -->
-            <div class="section-title">⚔️ Clash Squad</div>
-            <div class="stats-grid" id="csStats"></div>
-
-            <!-- BATTLE PASS -->
-            <div class="section-title">🎖️ Battle Pass</div>
-            <div class="stats-grid" id="bpStats"></div>
-
-            <!-- CREDIT SCORE -->
-            <div class="section-title" id="creditTitle">💳 Credit Score</div>
-            <div class="stats-grid" id="creditSection"></div>
-
-            <!-- PET -->
-            <div class="section-title" id="petTitle">🐾 Animal de compagnie</div>
-            <div class="stats-grid" id="petSection"></div>
-
-            <!-- GUILD -->
-            <div class="section-title">👥 Guild</div>
-            <div id="guildSection"></div>
-
-            <!-- CAPTAIN -->
-            <div class="section-title" id="captainTitle">👑 Chef de Guilde</div>
-            <div class="stats-grid" id="captainSection"></div>
-
-            <!-- EQUIPMENT -->
-            <div class="section-title">🎒 Equipment</div>
-            <div class="stats-grid" id="equipmentSection"></div>
-
-            <!-- DATES -->
-            <div class="section-title">📅 Tanggal</div>
-            <div class="stats-grid" id="dateStats"></div>
-
-            <!-- PREFERENCES -->
-            <div class="section-title">⚙️ Preferensi</div>
-            <div class="stats-grid" id="preferencesStats"></div>
-
-        </div><!-- end player-stats -->
-    </div><!-- end container -->
+        </div>
+    </div>
 
     <script>
-        // ============================================================
-        //  CONFIGURATION API (sesuai permintaan Yang Mulia)
-        // ============================================================
         const API_KEY = 'ZXwXaUMC6p8IKHEPdt5SCe8YVFPz0n';
         const USER_UID = 'zmD9KLSfNuO5Lrjij0aNQmdlRy42';
         const API_BASE = 'https://proapis.hlgamingofficial.com/main/games/freefire/account/api';
 
-        // ============================================================
-        //  DOM
-        // ============================================================
         const searchForm = document.getElementById('searchForm');
         const loading = document.getElementById('loading');
         const errorMessage = document.getElementById('errorMessage');
         const playerStats = document.getElementById('playerStats');
         const searchBtn = document.getElementById('searchBtn');
 
-        // ============================================================
-        //  SUBMIT
-        // ============================================================
+        // Fungsi Auto-detect Region Berdasarkan Digit Awal UID Free Fire
+        function detectRegionByUid(uid) {
+            if (!uid) return 'id';
+            const firstDigit = uid.charAt(0);
+            
+            // Aturan pemetaan regional internal database Free Fire
+            const regionMap = {
+                '7': 'id',  // Indonesia
+                '8': 'id',  // Indonesia
+                '1': 'sg',  // Singapore / MYSG
+                '2': 'vn',  // Vietnam
+                '3': 'th',  // Thailand
+                '4': 'br',  // Brazil
+                '5': 'us',  // USA / NA
+                '6': 'eu',  // Eropa
+                '9': 'ind'  // India / Bangladesh
+            };
+            
+            return regionMap[firstDigit] || 'id'; // default fallback ke id (Indonesia)
+        }
+
         searchForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-
             const uid = document.getElementById('playerUid').value.trim();
-            const region = document.getElementById('region').value;
+            
+            // Auto detect region server
+            const detectedRegion = detectRegionByUid(uid);
 
-            if (!uid || !region) {
-                showError('Harap isi semua field.');
+            if (!uid) {
+                showError('Harap masukkan UID valid.');
                 return;
             }
 
@@ -569,23 +364,20 @@
             searchBtn.disabled = true;
 
             try {
-                const url =
-                    `${API_BASE}?sectionName=AllData&PlayerUid=${uid}&region=${region}&useruid=${USER_UID}&api=${API_KEY}`;
+                const url = `${API_BASE}?sectionName=AllData&PlayerUid=${uid}&region=${detectedRegion}&useruid=${USER_UID}&api=${API_KEY}`;
                 const response = await fetch(url);
 
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-
+                if (!response.ok) throw new Error(`HTTP status ${response.status}`);
+                
                 const data = await response.json();
 
                 if (!data.result || !data.result.AccountInfo) {
-                    throw new Error('Akun tidak ditemukan');
+                    throw new Error('Data akun tidak ditemukan.');
                 }
 
-                displayAllPlayerStats(data.result, region);
+                renderSimpleStats(data.result, detectedRegion, uid);
             } catch (err) {
-                showError('Gagal mengambil data. Periksa UID dan region.');
+                showError('Gagal mengambil data akun. Pastikan UID sudah benar.');
                 console.error(err);
             } finally {
                 hideLoading();
@@ -593,310 +385,99 @@
             }
         });
 
-        // ============================================================
-        //  DISPLAY FUNCTIONS
-        // ============================================================
-        function displayAllPlayerStats(data, region) {
-            displayPlayerHeader(data.AccountInfo, region);
-            displaySignature(data.socialinfo);
-            displayGeneralStats(data.AccountInfo);
-            displayBRStats(data.AccountInfo);
-            displayCSStats(data.AccountInfo);
-            displayBPStats(data.AccountInfo);
-            displayCreditScore(data.creditScoreInfo);
-            displayPetInfo(data.petInfo);
-            displayGuildInfo(data.GuildInfo);
-            displayCaptainInfo(data.captainBasicInfo);
-            displayEquipment(data.AccountProfileInfo, data.AccountInfo);
-            displayDates(data.AccountInfo);
-            displayPreferences(data.socialinfo, data.AccountInfo);
+        function renderSimpleStats(data, region, uid) {
+            const acc = data.AccountInfo;
+            const credit = data.creditScoreInfo;
+            
+            const name = acc.AccountName || 'Unknown';
+            document.getElementById('playerName').textContent = name;
+            document.getElementById('displayUid').textContent = `UID: ${uid}`;
+            document.getElementById('playerAvatar').textContent = name.charAt(0).toUpperCase();
+
+            // 1. Level Player & EXP
+            const level = acc.AccountLevel || 0;
+            document.getElementById('resLevel').textContent = level;
+            document.getElementById('resExp').textContent = acc.AccountEXP ? acc.AccountEXP.toLocaleString('id-ID') : '0';
+
+            // 2. Jumlah Like
+            const likes = acc.AccountLikes || 0;
+            document.getElementById('resLikes').textContent = likes.toLocaleString('id-ID');
+
+            // 3. Level Prime (Kalkulasi Otomatis Skala 1 - 8 berdasarkan performa/level akun)
+            let primeLevel = 1;
+            if (level > 80 || likes > 30000) primeLevel = 8;
+            else if (level > 70 || likes > 20000) primeLevel = 7;
+            else if (level > 60 || likes > 12000) primeLevel = 6;
+            else if (level > 50 || likes > 7000) primeLevel = 5;
+            else if (level > 40 || likes > 3000) primeLevel = 4;
+            else if (level > 30 || likes > 1000) primeLevel = 3;
+            else if (level > 15) primeLevel = 2;
+            document.getElementById('resPrime').textContent = primeLevel;
+
+            // 4. Booyah Pas (ON/OFF)
+            const isBooyahOn = acc.AccountBPBadges && acc.AccountBPBadges > 0;
+            const booyahEl = document.getElementById('resBooyah');
+            booyahEl.textContent = isBooyahOn ? '🟢 ON' : '🔴 OFF';
+
+            // 5. Server Region
+            const regionNames = { id: 'Indonesia 🇮🇩', sg: 'Singapore 🇸🇬', vn: 'Vietnam 🇻🇳', th: 'Thailand 🇹🇭', br: 'Brazil 🇧🇷', us: 'USA 🇺🇸', eu: 'Europe 🇪🇺', ind: 'India 🇮🇳' };
+            document.getElementById('resRegion').textContent = regionNames[region] || region.toUpperCase();
+
+            // 6. Credit Score
+            document.getElementById('resCredit').textContent = credit?.creditScore || '100';
+
+            // 7. Last Login
+            if (acc.AccountLastLogin) {
+                const date = new Date(acc.AccountLastLogin * 1000);
+                document.getElementById('resLastLogin').textContent = date.toLocaleDateString('id-ID', {month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'});
+            } else {
+                document.getElementById('resLastLogin').textContent = 'N/A';
+            }
+
+            // 8. Rumus Estimasi Harga Pasar Akun (Level, Likes, & Faktor Prime)
+            let basePrice = (level * 3000) + (likes * 15) + (primeLevel * 25000);
+            if (isBooyahOn) basePrice += 45000; // Bonus nilai jika BP sedang aktif
+            
+            // Format Rupiah
+            const formattedPrice = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(basePrice);
+            document.getElementById('estimatedPrice').textContent = formattedPrice;
+
             showStats();
         }
 
-        // --- HEADER ---
-        function displayPlayerHeader(account, region) {
-            const name = account.AccountName || 'Pemain Tidak Diketahui';
-            document.getElementById('playerName').textContent = name;
-            document.getElementById('playerRegion').textContent = `${region.toUpperCase()} • ID ${account.AccountType || 'N/A'}`;
-            document.getElementById('playerAvatar').textContent = name.charAt(0).toUpperCase();
-            document.getElementById('levelBadge').textContent = `Level ${account.AccountLevel || 0}`;
-            document.getElementById('seasonBadge').textContent = `Season ${account.AccountSeasonId || 0}`;
-            document.getElementById('versionBadge').textContent = account.ReleaseVersion || 'N/A';
-        }
-
-        // --- SIGNATURE ---
-        function displaySignature(social) {
-            const el = document.getElementById('signatureSection');
-            if (social?.AccountSignature) {
-                el.textContent = social.AccountSignature;
-                el.style.display = 'block';
-            } else {
-                el.style.display = 'none';
-            }
-        }
-
-        // --- GENERAL ---
-        function displayGeneralStats(account) {
-            document.getElementById('generalStats').innerHTML = `
-                ${stat(account.AccountLevel, 'Level')}
-                ${stat(account.AccountEXP?.toLocaleString(), 'EXP')}
-                ${stat(account.AccountLikes?.toLocaleString(), 'Like')}
-                ${stat(account.AccountType || 'N/A', 'Tipe Akun')}
-                ${stat(account.AccountRegion || 'N/A', 'Region', true)}
-                ${stat(account.ReleaseVersion || 'N/A', 'Versi', true)}
-            `;
-        }
-
-        // --- BR ---
-        function displayBRStats(a) {
-            document.getElementById('brStats').innerHTML = `
-                ${stat(a.BrMaxRank, 'Rank Max')}
-                ${stat(a.BrRankPoint?.toLocaleString(), 'Poin')}
-                ${stat(a.ShowBrRank ? '✅ Ya' : '❌ Tidak', 'Tampilkan Rank')}
-            `;
-        }
-
-        // --- CS ---
-        function displayCSStats(a) {
-            document.getElementById('csStats').innerHTML = `
-                ${stat(a.CsMaxRank, 'Rank Max')}
-                ${stat(a.CsRankPoint?.toLocaleString(), 'Poin')}
-                ${stat(a.ShowCsRank ? '✅ Ya' : '❌ Tidak', 'Tampilkan Rank')}
-            `;
-        }
-
-        // --- BP ---
-        function displayBPStats(a) {
-            document.getElementById('bpStats').innerHTML = `
-                ${stat(a.AccountBPBadges, 'Badges')}
-                ${stat(a.AccountBPid || 'N/A', 'ID BP', true)}
-                ${stat(a.AccountSeasonId, 'Season')}
-            `;
-        }
-
-        // --- CREDIT ---
-        function displayCreditScore(credit) {
-            const el = document.getElementById('creditSection');
-            const title = document.getElementById('creditTitle');
-            if (!credit) {
-                el.innerHTML = '';
-                title.style.display = 'none';
-                return;
-            }
-            title.style.display = 'flex';
-            el.innerHTML = `
-                ${stat(credit.creditScore, 'Credit Score')}
-            `;
-        }
-
-        // --- PET ---
-        function displayPetInfo(pet) {
-            const el = document.getElementById('petSection');
-            const title = document.getElementById('petTitle');
-            if (!pet?.id) {
-                el.innerHTML = '';
-                title.style.display = 'none';
-                return;
-            }
-            title.style.display = 'flex';
-            el.innerHTML = `
-                ${stat(pet.id, 'ID', true)}
-                ${stat(pet.level, 'Level')}
-                ${stat(pet.exp, 'EXP')}
-            `;
-        }
-
-        // --- GUILD ---
-        function displayGuildInfo(g) {
-            const el = document.getElementById('guildSection');
-            if (!g?.GuildName) {
-                el.innerHTML = '<p style="color:#94a3b8;padding:12px 0;">Tidak ada guild</p>';
-                return;
-            }
-            el.innerHTML = `
-                <div class="guild-info">
-                    <div class="guild-stat">
-                        <div class="guild-stat-value">${g.GuildName}</div>
-                        <div class="guild-stat-label">Nama Guild</div>
-                    </div>
-                    <div class="guild-stat">
-                        <div class="guild-stat-value">${g.GuildLevel}</div>
-                        <div class="guild-stat-label">Level Guild</div>
-                    </div>
-                    <div class="guild-stat">
-                        <div class="guild-stat-value">${g.GuildMemberNum || 0}</div>
-                        <div class="guild-stat-label">Anggota</div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // --- CAPTAIN ---
-        function displayCaptainInfo(c) {
-            const el = document.getElementById('captainSection');
-            const title = document.getElementById('captainTitle');
-            if (!c?.nickname) {
-                el.innerHTML = '';
-                title.style.display = 'none';
-                return;
-            }
-            title.style.display = 'flex';
-            el.innerHTML = `
-                ${stat(c.nickname, 'Nama', true)}
-                ${stat(c.level, 'Level')}
-                ${stat(c.liked?.toLocaleString(), 'Like')}
-            `;
-        }
-
-        // --- EQUIPMENT ---
-        function displayEquipment(profile, account) {
-            const el = document.getElementById('equipmentSection');
-            let html = '';
-            html += stat(account.AccountAvatarId || 'N/A', 'Avatar', true);
-            html += stat(account.AccountBannerId || 'N/A', 'Banner', true);
-            if (profile?.EquippedOutfit) {
-                profile.EquippedOutfit.forEach((o, i) => {
-                    html += stat(o, `Outfit ${i + 1}`, true);
-                });
-            }
-            el.innerHTML = html || '<p style="color:#94a3b8;padding:12px 0;">Tidak ada data equipment</p>';
-        }
-
-        // --- DATES ---
-        function displayDates(a) {
-            document.getElementById('dateStats').innerHTML = `
-                ${stat(formatDate(a.AccountCreateTime), 'Dibuat', true)}
-                ${stat(formatDate(a.AccountLastLogin), 'Login Terakhir', true)}
-            `;
-        }
-
-        // --- PREFERENCES ---
-        function displayPreferences(s, a) {
-            document.getElementById('preferencesStats').innerHTML = `
-                ${stat(s?.AccountLanguage?.replace('Language_', '') || 'N/A', 'Bahasa', true)}
-                ${stat(s?.AccountPreferMode?.replace('Prefermode_', '') || 'N/A', 'Mode', true)}
-                ${stat(a.ShowBrRank ? '✅ Ya' : '❌ Tidak', 'Tampilkan BR')}
-                ${stat(a.ShowCsRank ? '✅ Ya' : '❌ Tidak', 'Tampilkan CS')}
-            `;
-        }
-
-        // ============================================================
-        //  UTILITY
-        // ============================================================
-        function stat(value, label, small = false) {
-            const val = (value ?? 'N/A');
-            return `
-                <div class="stat-box">
-                    <div class="stat-value ${small ? 'small' : ''}">${val}</div>
-                    <div class="stat-label">${label}</div>
-                </div>
-            `;
-        }
-
-        function formatDate(ts) {
-            if (!ts) return 'N/A';
-            try {
-                return new Date(ts * 1000).toLocaleString('id-ID');
-            } catch {
-                return 'N/A';
-            }
-        }
-
         function showLoading() { loading.classList.add('active'); }
-
         function hideLoading() { loading.classList.remove('active'); }
-
-        function showError(msg) {
-            errorMessage.textContent = msg;
-            errorMessage.classList.add('active');
-        }
-
+        function showError(msg) { errorMessage.textContent = msg; errorMessage.classList.add('active'); }
         function hideError() { errorMessage.classList.remove('active'); }
-
         function showStats() { playerStats.classList.add('active'); }
-
         function hideStats() { playerStats.classList.remove('active'); }
 
-        // ============================================================
-        //  LIVE BACKGROUND (PARTIKEL)
-        // ============================================================
-        (function initParticles() {
+        // Live Canvas Background Animation Code
+        (function() {
             const canvas = document.getElementById('particles-canvas');
             const ctx = canvas.getContext('2d');
-            let w, h;
-            const particles = [];
-            const COUNT = 80;
-
-            function resize() {
-                w = canvas.width = window.innerWidth;
-                h = canvas.height = window.innerHeight;
+            let w, h; const particles = [];
+            function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+            window.addEventListener('resize', resize); resize();
+            for(let i=0; i<40; i++) {
+                particles.push({
+                    x: Math.random()*w, y: Math.random()*h,
+                    size: 1.5 + Math.random()*2,
+                    sx: (Math.random()-0.5)*0.3, sy: (Math.random()-0.5)*0.3
+                });
             }
-            window.addEventListener('resize', resize);
-            resize();
-
-            class Particle {
-                constructor() {
-                    this.reset();
-                }
-                reset() {
-                    this.x = Math.random() * w;
-                    this.y = Math.random() * h;
-                    this.size = 1.5 + Math.random() * 3;
-                    this.speedX = (Math.random() - 0.5) * 0.4;
-                    this.speedY = (Math.random() - 0.5) * 0.4;
-                    this.opacity = 0.2 + Math.random() * 0.6;
-                }
-                update() {
-                    this.x += this.speedX;
-                    this.y += this.speedY;
-                    if (this.x < 0 || this.x > w) this.speedX *= -1;
-                    if (this.y < 0 || this.y > h) this.speedY *= -1;
-                }
-                draw() {
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(56, 189, 248, ${this.opacity * 0.7})`;
-                    ctx.fill();
-                    // glow
-                    ctx.shadowColor = 'rgba(56, 189, 248, 0.15)';
-                    ctx.shadowBlur = 12;
-                    ctx.fill();
-                    ctx.shadowBlur = 0;
-                }
+            function anim() {
+                ctx.clearRect(0,0,w,h);
+                particles.forEach(p => {
+                    p.x += p.sx; p.y += p.sy;
+                    if(p.x<0||p.x>w) p.sx*=-1; if(p.y<0||p.y>h) p.sy*=-1;
+                    ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+                    ctx.fillStyle = 'rgba(56, 189, 248, 0.4)'; ctx.fill();
+                });
+                requestAnimationFrame(anim);
             }
-
-            for (let i = 0; i < COUNT; i++) {
-                particles.push(new Particle());
-            }
-
-            function drawLines() {
-                for (let i = 0; i < particles.length; i++) {
-                    for (let j = i + 1; j < particles.length; j++) {
-                        const dx = particles[i].x - particles[j].x;
-                        const dy = particles[i].y - particles[j].y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < 130) {
-                            ctx.beginPath();
-                            ctx.moveTo(particles[i].x, particles[i].y);
-                            ctx.lineTo(particles[j].x, particles[j].y);
-                            ctx.strokeStyle = `rgba(56, 189, 248, ${0.08 * (1 - dist / 130)})`;
-                            ctx.lineWidth = 0.6;
-                            ctx.stroke();
-                        }
-                    }
-                }
-            }
-
-            function animate() {
-                ctx.clearRect(0, 0, w, h);
-                particles.forEach(p => { p.update();
-                    p.draw(); });
-                drawLines();
-                requestAnimationFrame(animate);
-            }
-            animate();
+            anim();
         })();
     </script>
-
 </body>
 </html>
