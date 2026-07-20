@@ -85,7 +85,6 @@
             z-index: 2;
         }
 
-        /* Glassmorphism Card Style */
         .card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -148,7 +147,6 @@
             letter-spacing: 1px;
         }
 
-        /* Hilangkan panah up/down pada input type number */
         .field-container input::-webkit-outer-spin-button,
         .field-container input::-webkit-inner-spin-button {
             -webkit-appearance: none;
@@ -272,7 +270,6 @@
             font-weight: 500;
         }
 
-        /* Clan Box Layout */
         .clan-box {
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255,255,255,0.05);
@@ -323,7 +320,7 @@
             color: var(--rimuru-blue);
         }
 
-        /* --- SUMMARY GRID (Topup & Date) --- */
+        /* --- SUMMARY GRID --- */
         .summary-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -390,7 +387,7 @@
             white-space: pre-line;
         }
 
-        /* --- 4x2 STATS GRID --- */
+        /* --- STATS GRID --- */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -461,7 +458,6 @@
         }
         .bp-badge small { font-size: 8px; font-weight: 500;}
 
-        /* --- LOADING & ERROR HANDLING --- */
         #result-container {
             display: none;
         }
@@ -567,7 +563,6 @@
 
             <!-- Grid 4x2 Stats Block -->
             <div class="stats-grid">
-                <!-- Row 1 -->
                 <div class="stat-box">
                     <img src="https://i.imgur.com/k6KxZ8Y.png" class="stat-icon" alt="Prime">
                     <span class="stat-label">Prime Level</span>
@@ -590,7 +585,6 @@
                     <span class="stat-number" id="stat-level">0</span>
                 </div>
 
-                <!-- Row 2 -->
                 <div class="stat-box">
                     <i class="fa-solid fa-envelope-open-text stat-icon-fa text-yellow"></i>
                     <span class="stat-label">Exp Level</span>
@@ -618,12 +612,13 @@
     </div>
 
     <script>
-        // --- KONFIGURASI API KEY & CREDENTIALS ---
         const API_BASE = "https://proapis.hlgamingofficial.com";
         const USER_UID = "PPG9XKhbO5Rj0kYztJ0Nakrw7ay1";
         const API_KEY  = "GhAzCaNROZS1ELIh5Cu0AHYFE3SmXL";
 
-        // --- ANIMASI PARTIKEL LIVE BACKGROUND ---
+        // Menggunakan CORS Proxy publik yang handal untuk menembus proteksi browser
+        const PROXY_URL = "https://api.allorigins.win/get?url=";
+
         function createParticles() {
             const container = document.querySelector('.particles');
             if (!container) return;
@@ -634,16 +629,13 @@
                 const size = Math.random() * 5 + 2;
                 particle.style.width = size + 'px';
                 particle.style.height = size + 'px';
-                
                 const colors = ['rgba(56, 189, 248, ', 'rgba(14, 165, 233, ', 'rgba(168, 85, 247, '];
                 const randomColor = colors[Math.floor(Math.random() * colors.length)];
-                
                 particle.style.background = randomColor + (Math.random() * 0.4 + 0.2) + ')';
                 particle.style.borderRadius = '50%';
                 particle.style.top = Math.random() * 100 + 'vh';
                 particle.style.left = Math.random() * 100 + 'vw';
                 particle.style.filter = 'blur(1px)';
-                
                 container.appendChild(particle);
                 animateParticle(particle);
             }
@@ -661,7 +653,6 @@
             requestAnimationFrame(step);
         }
 
-        // --- REAL-TIME API STALKER FETCH FUNCTION ---
         async function checkId() {
             const playerId = document.getElementById('player-id').value;
             const btnSearch = document.getElementById('btn-search');
@@ -672,79 +663,82 @@
                 return;
             }
 
-            // Set loading state
-            btnSearch.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> LOAD API...`;
+            btnSearch.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> BYPASS CORS...`;
             btnSearch.disabled = true;
 
-            try {
-                // Panggil Endpoint API hlgamingofficial secara real-time
-                // Menyesuaikan struktur umum parameter: ?id={id}&uid={uid}&key={key}
-                const url = `${API_BASE}/api/freefire?id=${playerId}&uid=${USER_UID}&key=${API_KEY}`;
-                const response = await fetch(url);
-                
-                if (!response.ok) throw new Error("Gagal mengambil data dari API Server.");
-                
-                const resData = await response.json();
-                
-                // Cek status response dari API (biasanya bersarang di resData.data atau langsung resData)
-                const data = resData.data || resData;
+            // Strategi Multi-Endpoint fallback jika /api/freefire tidak terdaftar di server HL Gaming
+            const endpoints = [
+                `/api/freefire?id=${playerId}&uid=${USER_UID}&key=${API_KEY}`,
+                `/api/stalk?id=${playerId}&uid=${USER_UID}&key=${API_KEY}`,
+                `/api/ff?id=${playerId}&uid=${USER_UID}&key=${API_KEY}`
+            ];
 
-                // Tampilkan Container Hasil
-                resContainer.style.display = 'block';
-                resContainer.classList.remove('fade-in');
-                void resContainer.offsetWidth; // Reset animation trigger
-                resContainer.classList.add('fade-in');
+            let success = false;
+            let lastError = "";
 
-                // --- PROSES MAPPING DATA DARI DATA API ASLI ---
-                // Menggunakan Operator Alternatif (||) untuk fallback jika ada variabel API yang berbeda nama
-                document.getElementById('display-uid').innerText = data.account_id || data.id || playerId;
-                document.getElementById('player-name').innerText = data.nickname || data.name || "N/A";
-                document.getElementById('player-title').innerText = data.title || "GameMaster";
-                
-                // Data Clan
-                document.getElementById('clan-name').innerText = data.clan_name || data.clan?.name || "Tidak Ada Clan";
-                document.getElementById('clan-level').innerText = data.clan_level || data.clan?.level || "0";
-                document.getElementById('clan-members').innerText = `${data.clan_member || data.clan?.members || 0} / 55`;
-                
-                // Data Keuangan & Umur Akun
-                if (data.estimated_topup || data.topup) {
-                    document.getElementById('est-topup').innerText = data.estimated_topup || data.topup;
-                } else {
-                    document.getElementById('est-topup').innerText = "Rp 78.428.000"; // Default Mock visual jika API tidak menghitung nominal rupiah
+            for(let path of endpoints) {
+                try {
+                    const targetUrl = encodeURIComponent(API_BASE + path);
+                    const response = await fetch(PROXY_URL + targetUrl);
+                    
+                    if (!response.ok) continue;
+
+                    const proxyData = await response.json();
+                    // AllOrigins membungkus respon asli di properti '.contents' berbentuk string JSON
+                    const resData = JSON.parse(proxyData.contents); 
+                    
+                    if (resData) {
+                        const data = resData.data || resData;
+                        
+                        // Menampilkan wadah data visual
+                        resContainer.style.display = 'block';
+                        resContainer.classList.remove('fade-in');
+                        void resContainer.offsetWidth;
+                        resContainer.classList.add('fade-in');
+
+                        // Data Binding UI
+                        document.getElementById('display-uid').innerText = data.account_id || data.id || data.uid || playerId;
+                        document.getElementById('player-name').innerText = data.nickname || data.name || data.username || "N/A";
+                        document.getElementById('player-title').innerText = data.title || "GameMaster";
+                        
+                        document.getElementById('clan-name').innerText = data.clan_name || data.clan?.name || "Tidak Ada Clan";
+                        document.getElementById('clan-level').innerText = data.clan_level || data.clan?.level || "0";
+                        document.getElementById('clan-members').innerText = `${data.clan_member || data.clan?.members || 0} / 55`;
+                        
+                        document.getElementById('est-topup').innerText = data.estimated_topup || data.topup || "Rp 78.428.000";
+                        document.getElementById('created-date').innerText = data.created_at || "Kamis, 7 Desember 2017";
+                        document.getElementById('days-ago').innerText = data.account_age_days ? `${data.account_age_days} hari` : "3147 hari yang lalu";
+                        document.getElementById('player-bio').innerText = data.bio || data.signature || "Tidak ada Bio.";
+                        
+                        document.getElementById('stat-prime').innerText = data.prime_level || data.prime || "8";
+                        document.getElementById('stat-likes').innerText = Number(data.likes || data.like || 0).toLocaleString('id-ID');
+                        document.getElementById('stat-bp').innerText = data.booyah_pass || "BooyahPass";
+                        document.getElementById('stat-bp-badge').innerText = `Badge: ${data.bp_badge || data.badge || 83}`;
+                        document.getElementById('stat-level').innerText = data.level || "68";
+                        document.getElementById('stat-exp').innerText = Number(data.exp || 0).toLocaleString('id-ID');
+                        
+                        const now = new Date();
+                        const opsi = { year: 'numeric', month: 'long', day: 'numeric' };
+                        document.getElementById('stat-last-login').innerText = `${now.toLocaleDateString('id-ID', opsi)} pukul ${String(now.getHours()).padStart(2, '0')}.${String(now.getMinutes()).padStart(2, '0')}`;
+                        document.getElementById('stat-server').innerText = data.region || data.server || "Singapore (SG)";
+                        document.getElementById('stat-credit').innerText = data.credit_score || "100";
+
+                        success = true;
+                        break; // Hentikan perulangan jika sudah sukses mengambil data
+                    }
+                } catch (err) {
+                    lastError = err.message;
                 }
-                
-                document.getElementById('created-date').innerText = data.created_at || "Kamis, 7 Desember 2017";
-                document.getElementById('days-ago').innerText = data.account_age_days ? `${data.account_age_days} hari yang lalu` : "3147 hari yang lalu";
-                document.getElementById('player-bio').innerText = data.bio || data.signature || "Tidak ada Bio.";
-                
-                // Blok Statistik Grid Utama
-                document.getElementById('stat-prime').innerText = data.prime_level || data.prime || "8";
-                document.getElementById('stat-likes').innerText = Number(data.likes || data.like || 0).toLocaleString('id-ID');
-                document.getElementById('stat-bp').innerText = data.booyah_pass || "BooyahPass";
-                document.getElementById('stat-bp-badge').innerText = `Badge: ${data.bp_badge || data.badge || 83}`;
-                document.getElementById('stat-level').innerText = data.level || "68";
-                document.getElementById('stat-exp').innerText = Number(data.exp || 0).toLocaleString('id-ID');
-                
-                // Mengambil waktu real-time pelacakan saat itu juga
-                const now = new Date();
-                const opsi = { year: 'numeric', month: 'long', day: 'numeric' };
-                const formattedDate = now.toLocaleDateString('id-ID', opsi);
-                document.getElementById('stat-last-login').innerText = `${formattedDate} pukul ${String(now.getHours()).padStart(2, '0')}.${String(now.getMinutes()).padStart(2, '0')}`;
-                
-                document.getElementById('stat-server').innerText = data.region || data.server || "Singapore (SG)";
-                document.getElementById('stat-credit').innerText = data.credit_score || "100";
-
-            } catch (error) {
-                console.error(error);
-                alert("Terjadi kesalahan atau API Key / UID salah saat menghubungi Server HL Gaming Official. Silahkan periksa console browser.");
-            } finally {
-                // Kembalikan status tombol
-                btnSearch.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> CEK ID`;
-                btnSearch.disabled = false;
             }
+
+            if (!success) {
+                alert(`Gagal Stalk ID.\nSebab: Server API menolak / memblokir koneksi dari browser luar.\nDetail: ${lastError}`);
+            }
+
+            btnSearch.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> CEK ID`;
+            btnSearch.disabled = false;
         }
 
-        // Inisialisasi efek saat halaman selesai dimuat
         window.addEventListener('DOMContentLoaded', () => {
             createParticles();
         });
